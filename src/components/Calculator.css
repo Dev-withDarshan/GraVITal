@@ -1,0 +1,273 @@
+.calculator-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cgpa-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px 40px;
+  background: var(--bg-surface);
+  border-left: 4px solid var(--accent-color);
+  border-radius: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 72px; /* Hugs exactly below the nav */
+  z-index: 50;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Compact Sticky HUD Mode */
+.cgpa-display.is-compact {
+  padding: 14px 28px;
+  background: var(--bg-input-focus);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.4);
+}
+
+.cgpa-display .display-content h3 {
+  transition: all 0.4s ease;
+}
+
+.cgpa-display.is-compact .display-content h3 {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.cgpa-value {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cgpa-display.is-compact .cgpa-value {
+  font-size: 28px !important; 
+}
+
+/* Shrink heavy vertical dividers automatically */
+.cgpa-display .divider {
+  transition: height 0.4s ease, margin 0.4s ease;
+}
+
+.cgpa-display.is-compact .divider {
+  height: 32px !important;
+  margin: 0 16px !important;
+}
+
+/* Hide bulky watermark icon when compact */
+.cgpa-display.is-compact .display-icon {
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+.display-icon {
+  color: var(--accent-glow);
+  opacity: 0.5;
+}
+
+.subject-section {
+  padding: 24px;
+  background: var(--bg-surface);
+  border-radius: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  font-size: 20px;
+  color: var(--text-main);
+}
+
+.add-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.subjects-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.subjects-table th {
+  text-align: left;
+  padding: 12px 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.subjects-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.subjects-table td:first-child { width: 40%; }
+.subjects-table td:nth-child(2) { width: 25%; }
+.subjects-table td:nth-child(3) { width: 25%; }
+.subjects-table td:last-child { width: 10%; text-align: right; }
+
+.delete-btn {
+  color: var(--text-muted);
+  padding: 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px !important;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Base Responsive */
+@media (max-width: 768px) {
+  /* Header stacking */
+  .dashboard-sub-header {
+    flex-direction: column !important;
+    gap: 16px;
+    align-items: stretch !important;
+    text-align: center;
+  }
+
+  .dashboard-sub-header .btn-secondary {
+    justify-content: center;
+  }
+
+  .cgpa-display {
+    padding: 24px;
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    border-left: none;
+    border-top: 4px solid var(--accent-color);
+  }
+
+  .cgpa-display .divider {
+    width: 100% !important;
+    height: 1px !important;
+    margin: 8px 0 !important;
+    background: var(--card-border) !important;
+  }
+
+  .cgpa-display.is-compact {
+    flex-direction: row;
+    padding: 10px 12px;
+    gap: 6px;
+    border-radius: 0 0 16px 16px; /* Smooth corners for sticky drop */
+  }
+
+  .cgpa-display.is-compact .divider {
+    display: none !important; /* Hide to prevent squishing into boxes */
+  }
+
+  .cgpa-display.is-compact .display-content h3 {
+    font-size: 9px !important;
+    letter-spacing: 0px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .cgpa-display.is-compact .cgpa-value {
+    font-size: 22px !important;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Table to Card Transition via Grid Layout */
+  .table-responsive {
+    overflow-x: hidden;
+  }
+  
+  .subjects-table, .subjects-table tbody {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  
+  .subjects-table thead {
+    display: none;
+  }
+  
+  .subjects-table tr {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+  
+  .subjects-table td {
+    border: none;
+    padding: 0;
+    display: flex;
+    flex: 1 1 calc(50% - 6px); /* Share half the row minus gap */
+    width: auto !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .subjects-table td:first-child { 
+    flex: 1 1 100%; /* Subject Name full width */
+  }
+
+  .subjects-table td:last-child { 
+    flex: 1 1 100%; /* Delete button full width */
+    margin-top: 4px;
+    border-top: 1px dashed var(--border-color);
+    padding-top: 12px;
+  }
+  
+  .subjects-table td .input-field, .subjects-table td select {
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0 !important;
+  }
+
+  .delete-btn {
+    width: 100%;
+    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
