@@ -188,7 +188,7 @@ A `render.yaml` is included for one-click deployment on Render.
 ## 👤 Author
 
 **Darshan**  
-GitHub: [@darsh175223](https://github.com/darsh175223)
+GitHub: [@Dev-withDarshan](https://github.com/Dev-withDarshan)
 
 ---
 
