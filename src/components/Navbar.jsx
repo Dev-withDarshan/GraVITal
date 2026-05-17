@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Hexagon, LogIn, LogOut, LayoutDashboard, Sun, Moon } from 'lucide-react';
+import { LogIn, LogOut, LayoutDashboard, Sun, Moon } from 'lucide-react';
 import { MagneticButton } from './Spotlight';
 import './Navbar.css';
 
@@ -25,7 +25,7 @@ export default function Navbar() {
     <nav className="global-navbar glass-panel">
       <div className="navbar-container">
         <div className="nav-brand-clickable" onClick={handleLogoClick}>
-          <Hexagon size={30} className="text-accent" />
+          <img src="/Logo.png" alt="ScoreLoom Logo" className="navbar-logo" />
           <span className="brand-text">Score<span className="smooth-gradient-text">Loom</span></span>
         </div>
 
