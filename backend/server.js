@@ -15,12 +15,24 @@ app.use(express.json({ limit: '10mb' }));
 // MongoDB Connection
 // ------------------------------
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/gpa_calculator';
 
-console.log('Connecting to MongoDB...');
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅ Connected to MongoDB Backend!'))
-  .catch(err => console.error('❌ MongoDB Connection Error:', err));
+async function connectDB() {
+  let uri = process.env.MONGODB_URI;
+
+  // If no real MongoDB URI is configured, use in-memory MongoDB
+  if (!uri || uri === 'your_mongodb_connection_string') {
+    const { MongoMemoryServer } = await import('mongodb-memory-server');
+    const mongod = await MongoMemoryServer.create();
+    uri = mongod.getUri();
+    console.log('⚡ Using in-memory MongoDB (data resets on restart)');
+  }
+
+  console.log('Connecting to MongoDB...');
+  await mongoose.connect(uri);
+  console.log('✅ Connected to MongoDB Backend!');
+}
+
+connectDB().catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 
 // ------------------------------
@@ -144,7 +156,6 @@ app.post('/api/data/save', async (req, res) => {
 
 // Start Server (only if not on Vercel)
 if (!process.env.VERCEL) {
-  const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });

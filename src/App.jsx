@@ -7,17 +7,16 @@ import LandingPage from './components/LandingPage';
 import AuthScreen from './components/AuthScreen';
 import Dashboard from './components/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-
-import MetaballBackground from './components/MetaballBackground';
+import ParticleBackground from './components/ParticleBackground';
 
 // Layout wrapper to easily include Navbar and global background on all pages
 const AppLayout = () => {
   const location = useLocation();
-  const isLandingPage = location.pathname === '/';
+  const showParticles = location.pathname === '/' || location.pathname === '/login';
 
   return (
     <>
-      {isLandingPage && <MetaballBackground />}
+      {showParticles && <ParticleBackground />}
       <Navbar />
       <Routes>
         <Route path="/" element={<LandingPage />} />

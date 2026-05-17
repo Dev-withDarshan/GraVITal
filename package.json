@@ -1,5 +1,5 @@
 {
-  "name": "gpa-react",
+  "name": "scoreloom",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -20,6 +20,7 @@
     "dotenv": "^17.4.1",
     "express": "^5.2.1",
     "lucide-react": "^1.7.0",
+    "mongodb-memory-server": "^11.1.0",
     "mongoose": "^9.4.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

@@ -1,0 +1,307 @@
+/* ============================================
+   WHAT-IF GRADE SIMULATOR
+   ============================================ */
+
+.simulator-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ─── Header Display ─── */
+.simulator-header {
+  display: flex;
+  align-items: center;
+  padding: 32px 40px;
+  border-left: 4px solid var(--accent-color);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sim-stat-group {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+}
+
+.sim-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sim-stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.sim-stat-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-main);
+}
+
+.sim-arrow-divider {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.sim-delta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-left: 24px;
+}
+
+.sim-delta.positive {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.sim-delta.negative {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.sim-watermark {
+  position: absolute;
+  right: 20px;
+  bottom: -10px;
+  opacity: 0.05;
+  color: var(--accent-color);
+}
+
+/* ─── Instructions ─── */
+.sim-instructions {
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--card-border);
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ─── Table Section ─── */
+.simulator-table-section {
+  padding: 24px;
+  border-radius: 20px;
+}
+
+.sim-table-responsive {
+  overflow-x: auto;
+}
+
+.sim-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.sim-table th {
+  text-align: left;
+  padding: 12px 14px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sim-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.sim-table td:first-child { width: 28%; }
+.sim-table td:nth-child(2) { width: 10%; }
+.sim-table td:nth-child(3) { width: 18%; }
+.sim-table td:nth-child(4) { width: 22%; }
+.sim-table td:nth-child(5) { width: 14%; }
+.sim-table td:last-child { width: 8%; text-align: right; }
+
+/* ─── Sim Grade Control ─── */
+.sim-grade-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sim-bump-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.sim-bump-btn:hover:not(:disabled) {
+  background: var(--accent-glow);
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.sim-bump-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.sim-grade-display {
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 60px;
+  text-align: center;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--card-border);
+  transition: all 0.3s ease;
+}
+
+.sim-grade-display.changed {
+  background: var(--accent-glow);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* ─── Impact Badges ─── */
+.sim-impact {
+  font-weight: 700;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.sim-impact.positive {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+
+.sim-impact.negative {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+
+/* Changed Row Highlight */
+.sim-row-changed {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .simulator-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+    border-left: none;
+    border-top: 4px solid var(--accent-color);
+    gap: 16px;
+  }
+
+  .sim-stat-group {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sim-stat-value {
+    font-size: 32px;
+  }
+
+  .sim-delta {
+    margin-left: 0;
+  }
+
+  .sim-arrow-divider {
+    display: none;
+  }
+
+  /* Table → Card layout */
+  .sim-table, .sim-table tbody {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .sim-table thead {
+    display: none;
+  }
+
+  .sim-table tr {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+  }
+
+  .sim-table td {
+    border: none;
+    padding: 0;
+    display: flex;
+    flex: 1 1 calc(50% - 5px);
+    width: auto !important;
+    min-width: 0 !important;
+  }
+
+  .sim-table td:first-child {
+    flex: 1 1 100%;
+  }
+
+  .sim-table td:nth-child(5) {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .sim-table td:last-child {
+    flex: 1 1 100%;
+    margin-top: 6px;
+    border-top: 1px dashed var(--card-border);
+    padding-top: 10px;
+    justify-content: center;
+  }
+
+  .sim-table td .input-field,
+  .sim-table td select {
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .sim-grade-control {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .delete-btn {
+    width: 100%;
+    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+  }
+}

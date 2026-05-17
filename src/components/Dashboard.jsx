@@ -3,12 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import SemesterCalculator from './SemesterCalculator';
 import OverallCalculator from './OverallCalculator';
 import TargetCalculator from './TargetCalculator';
-import { Save, LayoutDashboard, History, Target } from 'lucide-react';
+import GradeSimulator from './GradeSimulator';
+import { Save, LayoutDashboard, History, Target, FlaskConical } from 'lucide-react';
 import './Dashboard.css';
 
 export default function Dashboard() {
   const { currentUser, logout, userData, saveUserData, isLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState('semester'); // 'semester', 'overall', or 'target'
+  const [activeTab, setActiveTab] = useState('semester');
   
   // Local state to hold the current values of calculators before saving
   const [semesterData, setSemesterData] = useState(null);
@@ -27,7 +28,7 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="dashboard-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+      <div className="dashboard-loading">
         <h2 className="smooth-gradient-text animate-pulse">Syncing Cloud Database...</h2>
       </div>
     );
@@ -57,8 +58,11 @@ export default function Dashboard() {
     const newSem = {
       id: crypto.randomUUID(),
       name: `Added Sem ${currentSems.length + 1}`,
-      credits: credits,
-      gpa: gpa
+      mode: 'quick',
+      totalCredits: credits,
+      manualGPA: gpa,
+      subjects: [],
+      isIncluded: true
     };
     
     setOverallData({
@@ -70,68 +74,95 @@ export default function Dashboard() {
     setActiveTab('overall');
   };
 
-  return (
-    <div className="dashboard-container">
-      <div className="dashboard-subnav">
-        <div className="nav-tabs">
-          <button 
-            className={`nav-tab ${activeTab === 'semester' ? 'active' : ''}`}
-            onClick={() => setActiveTab('semester')}
-          >
-            <LayoutDashboard size={18} />
-            Semester GPA
-          </button>
-          <button 
-            className={`nav-tab ${activeTab === 'overall' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overall')}
-          >
-            <History size={18} />
-            CGPA
-          </button>
-          <button 
-            className={`nav-tab ${activeTab === 'target' ? 'active' : ''}`}
-            onClick={() => setActiveTab('target')}
-          >
-            <Target size={18} />
-            Target CGPA
-          </button>
-        </div>
+  const navItems = [
+    { key: 'semester', label: 'Semester GPA', icon: LayoutDashboard },
+    { key: 'overall', label: 'CGPA', icon: History },
+    { key: 'target', label: 'Target CGPA', icon: Target },
+    { key: 'simulator', label: 'What-If', icon: FlaskConical },
+  ];
 
-        <div className="nav-actions">
-          <button className="btn-primary btn-save" onClick={handleSave}>
-            <Save size={16} />
-            {saveStatus || 'Save Data to Cloud'}
-          </button>
+  return (
+    <div className="dashboard-shell">
+      {/* ── Top Sub-Navigation Bar ── */}
+      <div className="dashboard-topbar">
+        <div className="dashboard-topbar-inner">
+          {/* Left: Navigation Tabs */}
+          <div className="topbar-tabs">
+            {navItems.map(item => (
+              <button
+                key={item.key}
+                className={`topbar-tab ${activeTab === item.key ? 'active' : ''}`}
+                onClick={() => setActiveTab(item.key)}
+              >
+                <item.icon size={18} />
+                <span className="topbar-tab-label">{item.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Right: Save + User */}
+          <div className="topbar-actions">
+            {currentUser && currentUser !== 'guest' && (
+              <div className="topbar-user">
+                <div className="topbar-avatar">{currentUser.charAt(0).toUpperCase()}</div>
+                <span className="topbar-username">{currentUser}</span>
+              </div>
+            )}
+            <button className="btn-primary topbar-save-btn" onClick={handleSave}>
+              <Save size={16} />
+              <span>{saveStatus || 'Save to Cloud'}</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <main className="dashboard-content">
-        <div className="tab-content animate-fade-in">
-          {activeTab === 'semester' && (
-            <SemesterCalculator 
-              key={userData ? 'loaded' : 'default'}
-              initialData={semesterData || userData?.semester} 
-              overallData={overallData || userData?.overall}
-              onChange={setSemesterData} 
-              onAddToCGPA={handleAddToCGPA}
-            />
-          )}
-          {activeTab === 'overall' && (
-            <OverallCalculator 
-              key={userData ? 'loaded' : 'default'}
-              initialData={overallData || userData?.overall} 
-              onChange={setOverallData} 
-            />
-          )}
-          {activeTab === 'target' && (
-            <TargetCalculator 
-              key={userData ? 'loaded' : 'default'}
-              initialData={targetData || userData?.target} 
-              onChange={setTargetData} 
-            />
-          )}
+      {/* ── Centered Main Content ── */}
+      <main className="dashboard-main">
+        <div className="dashboard-content-wrapper">
+          <div className="tab-content animate-fade-in" key={activeTab}>
+            {activeTab === 'semester' && (
+              <SemesterCalculator 
+                key={userData ? 'loaded' : 'default'}
+                initialData={semesterData || userData?.semester} 
+                overallData={overallData || userData?.overall}
+                onChange={setSemesterData} 
+                onAddToCGPA={handleAddToCGPA}
+              />
+            )}
+            {activeTab === 'overall' && (
+              <OverallCalculator 
+                key={userData ? 'loaded' : 'default'}
+                initialData={overallData || userData?.overall} 
+                onChange={setOverallData} 
+              />
+            )}
+            {activeTab === 'target' && (
+              <TargetCalculator 
+                key={userData ? 'loaded' : 'default'}
+                initialData={targetData || userData?.target} 
+                onChange={setTargetData} 
+              />
+            )}
+            {activeTab === 'simulator' && (
+              <GradeSimulator />
+            )}
+          </div>
         </div>
       </main>
+
+      {/* ── Mobile Bottom Tab Bar ── */}
+      <div className="mobile-tab-bar">
+        {navItems.map(item => (
+          <button
+            key={item.key}
+            className={`mobile-tab ${activeTab === item.key ? 'active' : ''}`}
+            onClick={() => setActiveTab(item.key)}
+          >
+            <item.icon size={20} />
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

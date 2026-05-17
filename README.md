@@ -1,70 +1,203 @@
-# Gradevity
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vite-8-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
+  <img src="https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/MongoDB-In--Memory-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
+</p>
 
-Gradevity is a full-stack web application designed to help university students seamlessly track their academic performance. Built as a comprehensive academic tool, it allows users to calculate their current semester GPA, monitor their overall CGPA across multiple semesters, and strategically plan for future target scores.
+<h1 align="center">⬡ ScoreLoom</h1>
+<p align="center"><em>Weave Your Academic Future</em></p>
 
-The project emphasizes a clean, responsive user interface and integrates a custom WebGL-based visual background for a modern aesthetic.
+<p align="center">
+  A premium, full-stack GPA calculator and academic performance tracker with a modern glassmorphic UI, real-time cloud sync, and intelligent grade simulation.
+</p>
 
-## Features
+---
 
-- **Dynamic GPA Calculation:** Compute semester GPAs by adding individual courses with their respective credit hours and grades.
-- **Historical Tracking (CGPA):** Maintain a record of past semesters to calculate an accurate, cumulative GPA over time.
-- **Target Planning:** Input a desired future CGPA to determine the exact grades required in upcoming semesters to achieve that goal.
-- **Cloud Persistence:** Secure user authentication allowing students to save their progress and access it from any device.
-- **Modern UI/UX:** Features a custom-built WebGL metaball background, glassmorphism design elements, and seamless dark/light mode toggling.
+## ✨ Features
 
-## Technical Stack
+### 🎓 Semester GPA Calculator
+- **Subject-wise entry** with name, credits, and grade selection (VIT grading: S/A/B/C/D/F)
+- Separate **Theory** and **Lab** subject sections with collapsible panels
+- **Real-time GPA computation** — updates instantly as you type
+- **OCR-powered auto-fill** — upload a screenshot of your grades and let AI parse it
+- Quality badge & progress bar visualization
 
-**Frontend:**
-- React 19 (via Vite)
-- Three.js (for WebGL background rendering)
-- React Router (for client-side routing)
-- Vanilla CSS (for custom styling and glassmorphic panels)
+### 📊 Overall CGPA Tracker
+- **Dual-mode semester entry** — Quick (manual GPA + credits) or Detailed (subject-by-subject)
+- Accordion-style semester cards with smooth expand/collapse transitions
+- **Include/Exclude toggle** per semester for what-if analysis
+- Sticky, compact CGPA header that adapts on scroll
 
-**Backend:**
-- Node.js & Express.js
-- MongoDB & Mongoose (Database and ODM)
-- JWT & bcryptjs (Authentication and security)
+### 🎯 Target Calculator
+- Set your **desired CGPA** and see the exact GPA you need next semester
+- Animated progress ring with real-time feasibility analysis
+- Status badges: ✅ Achievable / ❌ Impossible
+- Smart insights and contextual tips
 
-## Getting Started
+### 🌗 Dark & Light Mode
+- Professional **theme toggle** in the global navbar (Sun/Moon icons)
+- Full design-system-level theming with CSS custom properties
+- Theme preference persisted via `localStorage`
 
-To run this project locally on your machine, follow these steps:
+### 🫧 Interactive Particle Background
+- Subtle, animated canvas particle effect on the **Landing** and **Login** pages
+- **Mouse repulsion** — particles smoothly push away from the cursor
+- Theme-aware palettes (bright pastels for dark mode, rich tones for light mode)
+- Zero external libraries — pure vanilla JS with `requestAnimationFrame`
+
+### ☁️ Cloud Sync
+- **User authentication** (register / login / guest mode)
+- Semester data saved to MongoDB and synced across devices
+- Auto-save with visual feedback
+
+### 🎨 Premium UI/UX
+- Glassmorphic card design with `backdrop-filter` blur
+- Smooth gradient text animations (Indigo → Cyan)
+- Magnetic hover buttons and 3D tilt card effects via `Spotlight.jsx`
+- Animated number transitions on GPA values (count-up with easing)
+- Staggered fade-in entrance animations
+- Fully responsive — works on desktop, tablet, and mobile
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer       | Technology                                  |
+|-------------|---------------------------------------------|
+| **Frontend**| React 19, Vite 8, React Router 7            |
+| **Styling** | Vanilla CSS with CSS Custom Properties       |
+| **Icons**   | Lucide React                                 |
+| **Backend** | Node.js, Express 5                           |
+| **Database**| MongoDB (via Mongoose) / In-Memory Server    |
+| **AI/OCR**  | Google Generative AI (Gemini)                |
+| **Hosting** | Vercel (frontend) + Render (backend)         |
+
+---
+
+## 📁 Project Structure
+
+```
+ScoreLoom/
+├── backend/
+│   └── server.js              # Express API (auth + data endpoints)
+├── public/
+│   ├── favicon.svg
+│   └── sitemap.xml
+├── src/
+│   ├── components/
+│   │   ├── AnimatedNumber.jsx      # Smooth number count-up component
+│   │   ├── AuthScreen.jsx          # Login / Register / Guest auth
+│   │   ├── Dashboard.jsx           # Main app shell with tab navigation
+│   │   ├── GradeSimulator.jsx      # What-if grade simulation
+│   │   ├── LandingPage.jsx         # Marketing landing page
+│   │   ├── Navbar.jsx              # Global navigation with theme toggle
+│   │   ├── OverallCalculator.jsx   # CGPA tracker with semester cards
+│   │   ├── ParticleBackground.jsx  # Canvas particle effect (theme-aware)
+│   │   ├── SemesterCalculator.jsx  # Subject-wise GPA calculator
+│   │   ├── Spotlight.jsx           # Interactive card & magnetic button effects
+│   │   └── TargetCalculator.jsx    # Target GPA planner
+│   ├── context/
+│   │   ├── AuthContext.jsx         # Authentication state management
+│   │   └── ThemeContext.jsx        # Dark/Light theme provider
+│   ├── hooks/
+│   │   └── useLocalStorage.js      # localStorage sync hook
+│   ├── utils/
+│   │   └── ocrParser.js            # AI-powered grade OCR
+│   ├── App.jsx                     # Root layout with routing
+│   ├── main.jsx                    # Entry point
+│   └── index.css                   # Global design tokens & theme variables
+├── index.html
+├── package.json
+├── vite.config.js
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- A running MongoDB instance (or a MongoDB Atlas URI)
+- **Node.js** ≥ 18
+- **npm** ≥ 9
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Dev-withDarshan/Gradevity.git
-   cd Gradevity
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/darsh175223/GradeDarshan.git
+cd GradeDarshan
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+# Install dependencies
+npm install
 
-3. **Configure environment variables**
-   Create a `.env` file in the root directory and configure your MongoDB connection and JWT secret:
-   ```env
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   ```
+# Create .env file (optional — for OCR and cloud features)
+echo "GEMINI_API_KEY=your_google_ai_key" > .env
+```
 
-4. **Run the development server**
-   This project uses `concurrently` to run both the frontend and backend simultaneously.
-   ```bash
-   npm run dev
-   ```
+### Development
 
-5. **Access the application**
-   Open your browser and navigate to `http://localhost:5173`.
+```bash
+# Start both frontend and backend concurrently
+npm run dev
 
-## Technical Highlights
+# Or start them separately:
+npm run dev:frontend   # Vite dev server (http://localhost:5173)
+npm run dev:backend    # Express API (http://localhost:5000)
+```
 
-As a student project, Gradevity was built to explore several advanced web development concepts:
-- **Optimized Rendering:** The WebGL background is designed to pause when not in the viewport, ensuring that the application remains lightweight and performant even on lower-end devices.
-- **State Management:** Complex calculations for the target CGPA and semester aggregations are handled efficiently within React components, minimizing unnecessary re-renders.
-- **Responsive Layout:** The dashboard seamlessly shifts from a comprehensive desktop layout to a mobile-friendly card system, ensuring usability across all platforms.
+### Production Build
+
+```bash
+npm run build      # Output to dist/
+npm run preview    # Preview the production build locally
+```
+
+---
+
+## 🌐 Deployment
+
+### Frontend (Vercel)
+The project includes a `vercel.json` for zero-config deployment:
+```bash
+npx vercel --prod
+```
+
+### Backend (Render)
+A `render.yaml` is included for one-click deployment on Render.
+
+---
+
+## 📸 Screenshots
+
+| Dark Mode | Light Mode |
+|-----------|------------|
+| Premium dark glassmorphic dashboard with glowing particle background | Clean, bright interface with rich contrast particles |
+
+---
+
+## 🧠 Key Design Decisions
+
+1. **No heavy animation libraries** — All animations use CSS transitions and `requestAnimationFrame` for maximum performance
+2. **CSS Custom Properties for theming** — A single `[data-theme]` attribute swap changes the entire UI without re-renders
+3. **Accordion via `max-height`** — Semester card expand/collapse uses stable `max-height` transitions instead of error-prone height: auto hacks
+4. **Particle count scales with viewport** — ~1 particle per 7000px² ensures smooth 60fps on any screen size
+
+---
+
+## 👤 Author
+
+**Darshan**  
+GitHub: [@darsh175223](https://github.com/darsh175223)
+
+---
+
+## 📄 License
+
+This project is for personal/educational use.
+
+---
+
+<p align="center">
+  Built with ❤️ and a lot of ☕
+</p>

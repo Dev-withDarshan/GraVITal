@@ -1,26 +1,48 @@
 import React, { useState } from 'react';
-import { Target, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Target, AlertCircle, CheckCircle2, TrendingUp, TrendingDown, BookOpen, GraduationCap, Crosshair, Layers, Lightbulb, Sparkles } from 'lucide-react';
 import './Calculator.css';
+
+/* ── SVG Progress Ring ── */
+const ProgressRing = ({ value, max = 10, size = 200, strokeWidth = 10, isImpossible }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const clampedValue = Math.min(value, max);
+  const progress = clampedValue / max;
+  const dashOffset = circumference * (1 - progress);
+
+  const color = isImpossible ? '#EF4444' : '#6366F1';
+  const glowColor = isImpossible ? 'rgba(239, 68, 68, 0.4)' : 'rgba(99, 102, 241, 0.4)';
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="target-ring">
+      {/* Track */}
+      <circle
+        cx={size / 2} cy={size / 2} r={radius}
+        fill="none"
+        stroke="rgba(255,255,255,0.06)"
+        strokeWidth={strokeWidth}
+      />
+      {/* Progress arc */}
+      <circle
+        cx={size / 2} cy={size / 2} r={radius}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={dashOffset}
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        style={{ transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s ease', filter: `drop-shadow(0 0 8px ${glowColor})` }}
+      />
+    </svg>
+  );
+};
 
 export default function TargetCalculator({ initialData, onChange }) {
   const [currentCredits, setCurrentCredits] = useState(initialData?.currentCredits || '');
   const [currentCGPA, setCurrentCGPA] = useState(initialData?.currentCGPA || '');
   const [targetCGPA, setTargetCGPA] = useState(initialData?.targetCGPA || '');
   const [nextSemCredits, setNextSemCredits] = useState(initialData?.nextSemCredits || '');
-  
-  const [isCompact, setIsCompact] = useState(false);
-  
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setIsCompact(prev => {
-        if (window.scrollY > 120) return true;
-        if (window.scrollY < 40) return false;
-        return prev;
-      });
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   React.useEffect(() => {
     if (onChange) {
@@ -49,105 +71,210 @@ export default function TargetCalculator({ initialData, onChange }) {
     const requiredForNextSem = requiredTotalPoints - currentTotalPoints;
     let requiredGPA = requiredForNextSem / nextCred;
 
-    // Cap minimum to 0 since negative GPA is not possible
     if (requiredGPA < 0) requiredGPA = 0;
 
     return requiredGPA.toFixed(2);
   };
 
   const requiredGPA = calculateRequiredGPA();
-  
   const isImpossible = requiredGPA !== null && Number(requiredGPA) > 10;
+  const hasResult = requiredGPA !== null;
+  const gpaNum = requiredGPA ? Number(requiredGPA) : 0;
+
+  // Generate insight message
+  const getInsight = () => {
+    if (!hasResult) return { icon: Lightbulb, text: 'Enter your details above to see what GPA you need next semester.', sub: '' };
+    if (isImpossible) return { icon: TrendingDown, text: 'You need a higher GPA next semester.', sub: 'Focus on improving your performance!' };
+    if (gpaNum >= 9) return { icon: TrendingUp, text: 'This is a stretch goal — you\'ll need top grades.', sub: 'Aim for S and A grades in every subject.' };
+    if (gpaNum >= 7) return { icon: TrendingUp, text: 'Very achievable with consistent effort.', sub: 'Maintain good study habits and stay focused.' };
+    return { icon: CheckCircle2, text: 'You\'re in great shape!', sub: 'Even a moderate performance will get you there.' };
+  };
+
+  const insight = getInsight();
 
   return (
-    <div className="calculator-container animate-fade-in">
-      <div className={`cgpa-display glass-panel ${isCompact ? 'is-compact' : ''}`} style={{ position: 'relative', overflow: 'hidden' }}>
-        <Target className="display-icon" size={120} style={{ position: 'absolute', right: '-20px', bottom: '-20px', opacity: 0.05 }} />
-        
-        <div style={{ flex: 1, zIndex: 1 }}>
-          <h3 style={{ fontSize: '14px', letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '8px' }}>
-            Required Next Sem GPA
-          </h3>
-          
-          {requiredGPA === null ? (
-            <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-muted)' }}>--</div>
-          ) : isImpossible ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div className="cgpa-value" style={{ fontSize: '48px', fontWeight: '800', lineHeight: 1, color: 'var(--error)' }}>
-                {requiredGPA}
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ color: 'var(--error)', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <AlertCircle size={14} /> Impossible
+    <div className="tc animate-fade-in">
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 1 — HERO RESULT CARD (Primary Focus)
+          ═══════════════════════════════════════════════════════════ */}
+      <div className="tc-hero">
+        {/* Header */}
+        <div className="tc-hero-header">
+          <div className="tc-hero-icon-wrap">
+            <Target size={28} />
+          </div>
+          <div>
+            <h2 className="tc-hero-title">Your Target CGPA</h2>
+            <p className="tc-hero-subtitle">Here's what you need to achieve</p>
+          </div>
+        </div>
+
+        {/* Body — Ring + Stats */}
+        <div className="tc-hero-body">
+          {/* Left — Progress Ring & GPA */}
+          <div className="tc-ring-section">
+            <div className="tc-ring-wrapper">
+              <ProgressRing
+                value={hasResult ? gpaNum : 0}
+                max={10}
+                size={190}
+                strokeWidth={12}
+                isImpossible={isImpossible}
+              />
+              <div className="tc-ring-center">
+                <span className="tc-ring-label">TARGET NEXT SEM</span>
+                <span className={`tc-ring-value ${isImpossible ? 'tc-impossible' : hasResult ? 'smooth-gradient-text' : 'tc-empty'}`}>
+                  {hasResult ? requiredGPA : '--'}
                 </span>
-                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Max achievable is 10.0</span>
+                <span className="tc-ring-sub">CGPA Required</span>
               </div>
             </div>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div className="cgpa-value smooth-gradient-text" style={{ fontSize: '56px', fontWeight: '800', lineHeight: 1 }}>
-                {requiredGPA}
+
+            {/* Status Badge */}
+            {hasResult && (
+              <div className={`tc-status-badge ${isImpossible ? 'tc-status-impossible' : 'tc-status-achievable'}`}>
+                {isImpossible ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
+                {isImpossible ? 'Impossible' : 'Achievable'}
               </div>
-              <span style={{ color: 'var(--success)', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16, 185, 129, 0.1)', padding: '6px 12px', borderRadius: '20px' }}>
-                <CheckCircle2 size={16} /> Achievable
-              </span>
+            )}
+            {isImpossible && <span className="tc-status-note">Max achievable is 10.0</span>}
+          </div>
+
+          {/* Right — Summary Stats */}
+          <div className="tc-stats-grid">
+            <div className="tc-stat-card">
+              <div className="tc-stat-icon" style={{ background: 'rgba(99, 102, 241, 0.12)', color: '#818CF8' }}>
+                <Layers size={18} />
+              </div>
+              <div className="tc-stat-info">
+                <span className="tc-stat-label">Current Completed Credits</span>
+                <span className="tc-stat-value">{currentCredits || '—'}</span>
+              </div>
             </div>
-          )}
+
+            <div className="tc-stat-card">
+              <div className="tc-stat-icon" style={{ background: 'rgba(34, 211, 238, 0.12)', color: '#22D3EE' }}>
+                <TrendingUp size={18} />
+              </div>
+              <div className="tc-stat-info">
+                <span className="tc-stat-label">Current CGPA</span>
+                <span className="tc-stat-value">{currentCGPA ? Number(currentCGPA).toFixed(2) : '—'}</span>
+              </div>
+            </div>
+
+            <div className="tc-stat-card">
+              <div className="tc-stat-icon" style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#10B981' }}>
+                <Crosshair size={18} />
+              </div>
+              <div className="tc-stat-info">
+                <span className="tc-stat-label">Target Desired CGPA</span>
+                <span className="tc-stat-value">{targetCGPA ? Number(targetCGPA).toFixed(2) : '—'}</span>
+              </div>
+            </div>
+
+            <div className="tc-stat-card">
+              <div className="tc-stat-icon" style={{ background: 'rgba(168, 85, 247, 0.12)', color: '#A855F7' }}>
+                <BookOpen size={18} />
+              </div>
+              <div className="tc-stat-info">
+                <span className="tc-stat-label">Credits in Next Sem</span>
+                <span className="tc-stat-value">{nextSemCredits || '—'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Insight Strip */}
+        <div className={`tc-insight ${isImpossible ? 'tc-insight-warn' : ''}`}>
+          <insight.icon size={20} className="tc-insight-icon" />
+          <div>
+            <span className="tc-insight-text">{insight.text}</span>
+            {insight.sub && <span className="tc-insight-sub">{insight.sub}</span>}
+          </div>
         </div>
       </div>
 
-      <div className="glass-panel" style={{ padding: '32px', marginTop: '24px' }}>
-        <h2 style={{ marginBottom: '24px', fontSize: '20px' }}>Calculate your target</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Current Completed Credits</label>
-            <input 
-              type="number" 
-              className="input-field" 
-              placeholder="e.g. 60"
-              min="0"
-              value={currentCredits}
-              onChange={(e) => setCurrentCredits(e.target.value)}
-            />
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 2 — INPUT FORM (Secondary)
+          ═══════════════════════════════════════════════════════════ */}
+      <div className="tc-form glass-panel">
+        <h2 className="tc-form-title">
+          <GraduationCap size={22} style={{ color: 'var(--primary)' }} />
+          Calculate Your Target
+        </h2>
+
+        <div className="tc-form-grid">
+          <div className="tc-field">
+            <label>Current Completed Credits</label>
+            <div className="tc-input-wrap">
+              <input
+                type="number"
+                className="input-field"
+                placeholder="e.g. 60"
+                min="0"
+                value={currentCredits}
+                onChange={(e) => setCurrentCredits(e.target.value)}
+              />
+              <span className="tc-input-suffix">Credits</span>
+            </div>
           </div>
-          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Current CGPA</label>
-            <input 
-              type="number" 
-              className="input-field" 
-              placeholder="e.g. 7.5"
-              step="0.01"
-              min="0"
-              max="10"
-              value={currentCGPA}
-              onChange={(e) => setCurrentCGPA(e.target.value)}
-            />
+
+          <div className="tc-field">
+            <label>Current CGPA</label>
+            <div className="tc-input-wrap">
+              <input
+                type="number"
+                className="input-field"
+                placeholder="e.g. 7.5"
+                step="0.01"
+                min="0"
+                max="10"
+                value={currentCGPA}
+                onChange={(e) => setCurrentCGPA(e.target.value)}
+              />
+              <span className="tc-input-suffix">CGPA</span>
+            </div>
           </div>
-          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Target Desired CGPA</label>
-            <input 
-              type="number" 
-              className="input-field" 
-              placeholder="e.g. 8.0"
-              step="0.01"
-              min="0"
-              max="10"
-              value={targetCGPA}
-              onChange={(e) => setTargetCGPA(e.target.value)}
-            />
+
+          <div className="tc-field">
+            <label>Target Desired CGPA</label>
+            <div className="tc-input-wrap">
+              <input
+                type="number"
+                className="input-field"
+                placeholder="e.g. 8.0"
+                step="0.01"
+                min="0"
+                max="10"
+                value={targetCGPA}
+                onChange={(e) => setTargetCGPA(e.target.value)}
+              />
+              <span className="tc-input-suffix">CGPA</span>
+            </div>
           </div>
-          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Credits in Next Sem</label>
-            <input 
-              type="number" 
-              className="input-field" 
-              placeholder="e.g. 20"
-              min="1"
-              value={nextSemCredits}
-              onChange={(e) => setNextSemCredits(e.target.value)}
-            />
+
+          <div className="tc-field">
+            <label>Credits in Next Sem</label>
+            <div className="tc-input-wrap">
+              <input
+                type="number"
+                className="input-field"
+                placeholder="e.g. 20"
+                min="1"
+                value={nextSemCredits}
+                onChange={(e) => setNextSemCredits(e.target.value)}
+              />
+              <span className="tc-input-suffix">Credits</span>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* ── Tip Footer ── */}
+      <div className="tc-tip">
+        <Sparkles size={18} className="tc-tip-icon" />
+        <span>Tip: Keep your current CGPA strong and try to score higher in the next semester!</span>
       </div>
     </div>
   );

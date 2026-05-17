@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { GraduationCap, Sun, Moon, LogIn, LogOut, LayoutDashboard } from 'lucide-react';
+import { Hexagon, LogIn, LogOut, LayoutDashboard, Sun, Moon } from 'lucide-react';
 import { MagneticButton } from './Spotlight';
 import './Navbar.css';
 
@@ -25,13 +25,19 @@ export default function Navbar() {
     <nav className="global-navbar glass-panel">
       <div className="navbar-container">
         <div className="nav-brand-clickable" onClick={handleLogoClick}>
-          <GraduationCap size={32} className="text-accent" />
-          <span className="brand-text">Grade<span className="smooth-gradient-text">Vity</span></span>
+          <Hexagon size={30} className="text-accent" />
+          <span className="brand-text">Score<span className="smooth-gradient-text">Loom</span></span>
         </div>
 
         <div className="nav-actions-group">
-          <button className="theme-toggle-btn" onClick={toggleTheme} aria-label="Toggle Theme">
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          {/* Theme Toggle */}
+          <button
+            className="theme-toggle-btn"
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
           {currentUser ? (

@@ -54,9 +54,6 @@ export function SpotlightCard({ children, className = '', style = {}, ...rest })
 
     cancelAnimationFrame(frameId.current);
     frameId.current = requestAnimationFrame(tick);
-
-    // Communicate to background WebGL
-    window.dispatchEvent(new CustomEvent('ui-hover-focus', { detail: { active: true } }));
   }, [tick]);
 
   const onLeave = useCallback(() => {
@@ -67,8 +64,6 @@ export function SpotlightCard({ children, className = '', style = {}, ...rest })
     target.current = { rx: 0, ry: 0, scale: 1 };
     cancelAnimationFrame(frameId.current);
     frameId.current = requestAnimationFrame(tick);
-
-    window.dispatchEvent(new CustomEvent('ui-hover-focus', { detail: { active: false } }));
   }, [tick]);
 
   React.useEffect(() => {
@@ -149,9 +144,6 @@ export function MagneticButton({
 
     cancelAnimationFrame(frameId.current);
     frameId.current = requestAnimationFrame(tick);
-    
-    // Connect to global WebGL attraction
-    window.dispatchEvent(new CustomEvent('ui-hover-focus', { detail: { active: true } }));
   }, [strength, maxShift, tick]);
 
   const onLeave = useCallback(() => {
@@ -159,8 +151,6 @@ export function MagneticButton({
     target.current = { x: 0, y: 0, scale: 1 };
     cancelAnimationFrame(frameId.current);
     frameId.current = requestAnimationFrame(tick);
-    
-    window.dispatchEvent(new CustomEvent('ui-hover-focus', { detail: { active: false } }));
   }, [tick]);
 
   const onDown = useCallback(() => {

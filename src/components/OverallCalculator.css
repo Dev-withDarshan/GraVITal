@@ -1,0 +1,481 @@
+/* ============================================
+   OVERALL CALCULATOR - SEMESTER CARDS
+   ============================================ */
+
+.semester-cards-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.semester-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---- Semester Card ---- */
+.sem-card {
+  padding: 0;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 16px;
+}
+
+.sem-card.sem-excluded {
+  opacity: 0.5;
+  filter: grayscale(0.3);
+}
+
+.sem-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -6px var(--accent-glow);
+}
+
+.sem-card.expanded {
+  box-shadow: 0 0 0 1px var(--primary), 0 8px 32px -8px var(--accent-glow);
+}
+
+/* ---- Card Header ---- */
+.sem-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 24px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.sem-card-header:hover {
+  background: var(--bg-input);
+}
+
+.sem-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sem-name-input {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 4px 8px;
+  border-radius: 8px;
+  max-width: 180px;
+  transition: background 0.2s ease;
+  cursor: text;
+}
+
+.sem-name-input:focus {
+  background: var(--bg-input);
+}
+
+/* ---- Mode Badge ---- */
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mode-badge.quick {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.mode-badge.detailed {
+  background: rgba(34, 211, 238, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+}
+
+/* ---- Card Stats Row ---- */
+.sem-card-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.sem-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sem-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.sem-stat-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sem-card-actions-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+/* ---- Include Toggle ---- */
+.include-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.include-toggle:hover {
+  color: var(--text-main);
+}
+
+.include-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-color);
+  cursor: pointer;
+}
+
+.include-label {
+  font-weight: 500;
+}
+
+.sem-delete {
+  padding: 6px;
+}
+
+.expand-icon svg {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sem-card.expanded .expand-icon svg {
+  transform: rotate(180deg);
+}
+
+/* ---- Card Body (Expanded) ---- */
+.sem-card-body {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 24px;
+  overflow: hidden;
+  border-top: 1px solid transparent;
+  transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+              opacity 0.4s ease,
+              padding 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 0.4s ease;
+}
+
+.sem-card.expanded .sem-card-body {
+  max-height: 1500px;
+  opacity: 1;
+  padding: 16px 24px 24px;
+  border-top-color: var(--card-border);
+}
+
+/* ---- Mode Toggle Group ---- */
+.mode-toggle-group {
+  display: flex;
+  gap: 0;
+  background: var(--bg-input);
+  border-radius: 12px;
+  padding: 4px;
+  margin: 16px 0;
+  border: 1px solid var(--card-border);
+}
+
+.mode-toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.mode-toggle-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-input-focus);
+}
+
+.mode-toggle-btn.active {
+  background: var(--accent-color);
+  color: white;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+/* ---- Quick Entry ---- */
+.quick-entry-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.quick-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quick-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ---- Detailed Entry ---- */
+.detailed-entry-section {
+  margin-top: 16px;
+}
+
+.detailed-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  margin-bottom: 12px;
+}
+
+.detailed-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 480px;
+}
+
+.detailed-table th {
+  text-align: left;
+  padding: 10px 14px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: var(--bg-input);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.detailed-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.detailed-table td:first-child { width: 45%; }
+.detailed-table td:nth-child(2) { width: 20%; }
+.detailed-table td:nth-child(3) { width: 25%; }
+.detailed-table td:last-child { width: 10%; text-align: center; }
+
+.detailed-table tr:last-child td {
+  border-bottom: none;
+}
+
+.grade-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 12px !important;
+  cursor: pointer;
+}
+
+.add-subject-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+/* ---- Computed GPA Display ---- */
+.computed-gpa-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--bg-input);
+  border-radius: 12px;
+  border: 1px dashed var(--accent-glow);
+}
+
+.computed-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.computed-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* ---- Empty State Card ---- */
+.empty-state-card {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .sem-card-header {
+    padding: 16px;
+  }
+
+  .sem-card-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .sem-card-stats {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .sem-card-actions-header {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
+  .sem-card.expanded .sem-card-body {
+    padding: 12px 16px 16px;
+  }
+
+  .quick-entry-fields {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .mode-toggle-group {
+    margin: 12px 0;
+  }
+
+  .mode-toggle-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .detailed-table-wrapper {
+    border-radius: 8px;
+  }
+
+  /* Detailed table → card layout on mobile */
+  .detailed-table,
+  .detailed-table tbody {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .detailed-table thead {
+    display: none;
+  }
+
+  .detailed-table tr {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: var(--bg-input);
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+  }
+
+  .detailed-table td {
+    border: none;
+    padding: 0;
+    display: flex;
+    flex: 1 1 calc(50% - 4px);
+    width: auto !important;
+    min-width: 0 !important;
+  }
+
+  .detailed-table td:first-child {
+    flex: 1 1 100%;
+  }
+
+  .detailed-table td:last-child {
+    flex: 1 1 100%;
+    margin-top: 4px;
+    border-top: 1px dashed var(--card-border);
+    padding-top: 8px;
+    justify-content: center;
+  }
+
+  .detailed-table td .input-field,
+  .detailed-table td select {
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .computed-gpa-display {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+
+  .computed-value {
+    font-size: 24px;
+  }
+}
+
+/* ============================================
+   LIGHT MODE OVERRIDES
+   ============================================ */
+[data-theme="light"] .sem-card:hover {
+  box-shadow: 0 8px 24px -6px rgba(79, 70, 229, 0.15);
+}
+
+[data-theme="light"] .sem-card.expanded {
+  box-shadow: 0 0 0 1px var(--primary), 0 8px 32px -8px rgba(79, 70, 229, 0.12);
+}
+
+[data-theme="light"] .mode-badge.quick {
+  background: rgba(79, 70, 229, 0.08);
+  border-color: rgba(79, 70, 229, 0.18);
+}
+
+[data-theme="light"] .mode-badge.detailed {
+  background: rgba(8, 145, 178, 0.08);
+  border-color: rgba(8, 145, 178, 0.18);
+}

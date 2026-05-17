@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { GraduationCap, LogIn, UserPlus, User, Eye, EyeOff } from 'lucide-react';
-import './AuthScreen.css'; // Let's define some specific scoped CSS here or just use scoped classes
+import { Hexagon, LogIn, UserPlus, User, Eye, EyeOff } from 'lucide-react';
+import './AuthScreen.css';
 
 export default function AuthScreen() {
   const [isLogin, setIsLogin] = useState(true);
@@ -46,9 +46,9 @@ export default function AuthScreen() {
       <div className="glass-panel auth-card">
         <div className="auth-header">
           <div className="icon-wrapper">
-            <GraduationCap size={40} className="text-accent" />
+            <Hexagon size={40} className="text-accent" />
           </div>
-          <h1>Grade<span className="smooth-gradient-text">Vity</span></h1>
+          <h1>Score<span className="smooth-gradient-text">Loom</span></h1>
           <p className="subtitle">{isLogin ? 'Welcome back! Log in to continue.' : 'Create an account to start tracking.'}</p>
         </div>
 

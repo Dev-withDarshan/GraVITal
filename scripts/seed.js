@@ -19,8 +19,8 @@ const labSubjects = [
 ];
 
 async function setup() {
-  const username = 'darshan_k';
-  const password = 'mypassword123';
+  const username = 'testuser';
+  const password = 'Test@1234';
 
   console.log('1. Re-saving explicit payload...');
 

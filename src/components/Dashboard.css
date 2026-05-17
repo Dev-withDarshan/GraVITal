@@ -1,157 +1,216 @@
-.dashboard-container {
-  min-height: 100vh;
+/* ============================================
+   DASHBOARD — TOP NAV + CENTERED CONTENT
+   ============================================ */
+
+/* ─── Shell ─── */
+.dashboard-shell {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
 }
 
-.dashboard-subnav {
+.dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  width: 100%;
+}
+
+/* ─── Top Sub-Navigation Bar ─── */
+.dashboard-topbar {
+  width: 100%;
+  background: var(--bg-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dashboard-topbar-inner {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
-  background: var(--bg-surface);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 24px;
-  border-bottom-left-radius: 24px;
-  border-bottom-right-radius: 24px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  height: 60px;
+  gap: 24px;
 }
 
-.nav-tabs {
+/* ─── Tabs ─── */
+.topbar-tabs {
   display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.topbar-tab {
+  display: flex;
+  align-items: center;
   gap: 8px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.topbar-tab:hover {
+  color: var(--text-main);
   background: var(--bg-input);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 6px;
-  border-radius: 14px;
+}
+
+.topbar-tab.active {
+  color: white;
+  background: var(--primary);
+  box-shadow: 0 2px 12px var(--accent-glow);
+  font-weight: 600;
+}
+
+/* ─── Right Actions ─── */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 12px;
+  background: var(--bg-input);
   border: 1px solid var(--card-border);
 }
 
-.nav-tab {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  color: var(--text-muted);
-  transition: all 0.3s ease;
-}
-
-.nav-tab:hover {
-  color: var(--text-main);
-  background: var(--bg-input-focus);
-}
-
-.nav-tab.active {
-  background: var(--accent-color);
-  color: white;
-  box-shadow: 0 4px 12px var(--accent-glow);
-}
-
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-right: 20px;
-  border-right: 1px solid var(--border-color);
-}
-
-.avatar {
-  width: 36px;
-  height: 36px;
+.topbar-avatar {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: linear-gradient(135deg, #6366F1, #22D3EE);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
   color: white;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+  text-transform: uppercase;
+  flex-shrink: 0;
 }
 
-.username {
-  font-weight: 500;
+.topbar-username {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-main);
   text-transform: capitalize;
 }
 
-.btn-save {
-  padding: 10px 20px;
+.topbar-save-btn {
+  padding: 8px 20px;
+  font-size: 13px;
+  border-radius: 10px;
+  gap: 6px;
 }
 
-.btn-icon {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-}
-
-.btn-icon:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--error);
-  border-color: rgba(239, 68, 68, 0.2);
-}
-
-.dashboard-content {
+/* ─── Main Content — Centered ─── */
+.dashboard-main {
   flex: 1;
-  padding: 0 24px 40px;
-  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 24px 60px;
   width: 100%;
-  margin: 0 auto;
 }
 
-/* Responsive adjustments */
+.dashboard-content-wrapper {
+  max-width: 1100px;
+  width: 100%;
+}
+
+.tab-content {
+  width: 100%;
+}
+
+/* ─── Mobile Bottom Tab Bar ─── */
+.mobile-tab-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-color);
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  z-index: 200;
+  gap: 4px;
+}
+
+.mobile-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.mobile-tab.active {
+  color: var(--accent-color);
+  background: var(--accent-glow);
+  font-weight: 600;
+}
+
+/* ─── Responsive ─── */
 @media (max-width: 768px) {
-  .dashboard-subnav {
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-    border-radius: 0 0 16px 16px;
-  }
-  
-  .nav-tabs {
-    width: 100%;
-    overflow-x: auto;
-    justify-content: flex-start;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Hide scrollbar for cleaner look */
+  .dashboard-topbar-inner {
+    padding: 0 16px;
+    height: 52px;
   }
 
-  .nav-tabs::-webkit-scrollbar {
+  .topbar-tabs {
     display: none;
   }
 
-  .nav-tab {
-    white-space: nowrap;
-    padding: 10px 16px;
-    font-size: 14px;
-  }
-  
-  .nav-actions {
+  .topbar-actions {
     width: 100%;
-    justify-content: center;
-  }
-  
-  .btn-save {
-    width: 100%;
+    justify-content: space-between;
   }
 
-  .dashboard-content {
-    padding: 0 16px 30px;
+  .mobile-tab-bar {
+    display: flex;
+  }
+
+  .dashboard-main {
+    padding: 24px 16px 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar-username {
+    display: none;
+  }
+
+  .topbar-save-btn span {
+    display: none;
+  }
+
+  .topbar-save-btn {
+    padding: 8px 12px;
   }
 }

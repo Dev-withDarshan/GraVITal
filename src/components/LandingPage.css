@@ -18,9 +18,9 @@
 .hero-badge {
   display: inline-block;
   padding: 6px 16px;
-  background: rgba(16, 185, 129, 0.1);
-  color: var(--success);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: rgba(99, 102, 241, 0.10);
+  color: var(--accent);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
@@ -28,8 +28,6 @@
 }
 
 .hero-title {
-  /* margin-bottom remains, but actual text styles move to base/glow if needed,
-     though keeping font-size/line-height/color here lets them inherit nicely! */
   font-size: 56px;
   line-height: 1.1;
   margin-bottom: 24px;
@@ -55,13 +53,13 @@
 
 .interactive-text-base {
   grid-area: overlap;
-  opacity: 1; /* Keep text perfectly normal and fully visible when NOT hovered */
+  opacity: 1;
   transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), text-shadow 0.4s ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .interactive-text-container:hover .interactive-text-base {
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
   }
 }
 
@@ -141,7 +139,7 @@
 .feature-icon {
   width: 64px;
   height: 64px;
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--accent-glow);
   border-radius: 16px;
   display: flex;
   align-items: center;
