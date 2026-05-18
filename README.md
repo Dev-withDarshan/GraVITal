@@ -63,9 +63,9 @@
 
 ## 🛠️ Tech Stack
 
-| Layer       | Technology                                  |
-|-------------|---------------------------------------------|
-| **Frontend**| React 19, Vite 8, React Router 7            |
+| Layer       | Technology                                   |
+|-------------|----------------------------------------------|
+| **Frontend**| React 19, Vite 8, React Router 7             |
 | **Styling** | Vanilla CSS with CSS Custom Properties       |
 | **Icons**   | Lucide React                                 |
 | **Backend** | Node.js, Express 5                           |
