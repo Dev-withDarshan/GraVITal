@@ -15,7 +15,7 @@ export const scanImageForSubjects = async (imageFile, onProgress) => {
   if (onProgress) onProgress(30);
 
   // Send to backend
-  const backendEndpoint = '/api/scan-screenshot';
+  const backendEndpoint = 'https://cgpa-grade-calculator-backend.onrender.com/api/scan-screenshot';
   
   let response;
   try {

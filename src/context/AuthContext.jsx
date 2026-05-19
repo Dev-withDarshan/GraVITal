@@ -6,7 +6,7 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5000');
+  const API = "https://cgpa-grade-calculator-backend.onrender.com";
   
   const [currentUser, setCurrentUser] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
   const loadUserData = async (username) => {
     try {
-      const res = await fetch(`${API_URL}/api/gpa/${username}`);
+      const res = await fetch(`${API}/api/gpa/${username}`);
       const data = await res.json();
 
       console.log("Loaded user data:", data);
@@ -27,6 +27,18 @@ export const AuthProvider = ({ children }) => {
 
   // 💀 STEP 3: LOAD DATA ON PAGE REFRESH
   useEffect(() => {
+    // Warmup call to wake the backend before any user requests are made
+    const warmupBackend = async () => {
+      try {
+        console.log("Warming up backend...");
+        await fetch("https://cgpa-grade-calculator-backend.onrender.com/");
+        console.log("Backend warmup complete!");
+      } catch (err) {
+        console.error("Warmup call failed:", err);
+      }
+    };
+    warmupBackend();
+
     const user = localStorage.getItem("user");
 
     if (user) {
@@ -53,7 +65,7 @@ export const AuthProvider = ({ children }) => {
   // 🚀 STEP 2: CONNECT LOGIN
   const login = async (username, password) => {
     try {
-      const res = await fetch(`${API_URL}/api/auth/login`, {
+      const res = await fetch(`${API}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -84,7 +96,7 @@ export const AuthProvider = ({ children }) => {
   // 🚀 STEP 1: CONNECT SIGNUP
   const signup = async (username, password) => {
     try {
-      const res = await fetch(`${API_URL}/api/auth/register`, {
+      const res = await fetch(`${API}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -125,7 +137,7 @@ export const AuthProvider = ({ children }) => {
 
     console.log("🔥 SENDING GPA DATA:", data);
 
-    const res = await fetch(`${API_URL}/api/gpa/save-gpa`, {
+    const res = await fetch(`${API}/api/gpa/save-gpa`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

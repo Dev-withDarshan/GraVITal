@@ -10,7 +10,7 @@ import './Dashboard.css';
 export default function Dashboard() {
   const { currentUser, logout, userData, saveUserData, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('semester');
-  
+
   // Local state to hold the current values of calculators before saving
   const [semesterData, setSemesterData] = useState(null);
   const [overallData, setOverallData] = useState(null);
@@ -40,7 +40,7 @@ export default function Dashboard() {
       overall: overallData,
       target: targetData
     };
-    
+
     setSaveStatus('Saving...');
     try {
       await saveUserData(dataToSave);
@@ -53,7 +53,7 @@ export default function Dashboard() {
 
   const handleAddToCGPA = (credits, gpa) => {
     if (!credits || credits <= 0) return;
-    
+
     const currentSems = overallData?.semesters || (userData?.overall?.semesters || []);
     const newSem = {
       id: crypto.randomUUID(),
@@ -64,12 +64,12 @@ export default function Dashboard() {
       subjects: [],
       isIncluded: true
     };
-    
+
     setOverallData({
       ...overallData,
       semesters: [...currentSems, newSem]
     });
-    
+
     // Switch to the overall tab to show the newly added semester!
     setActiveTab('overall');
   };
@@ -121,26 +121,26 @@ export default function Dashboard() {
         <div className="dashboard-content-wrapper">
           <div className="tab-content animate-fade-in" key={activeTab}>
             {activeTab === 'semester' && (
-              <SemesterCalculator 
+              <SemesterCalculator
                 key={userData ? 'loaded' : 'default'}
-                initialData={semesterData || userData?.semester} 
+                initialData={semesterData || userData?.semester}
                 overallData={overallData || userData?.overall}
-                onChange={setSemesterData} 
+                onChange={setSemesterData}
                 onAddToCGPA={handleAddToCGPA}
               />
             )}
             {activeTab === 'overall' && (
-              <OverallCalculator 
+              <OverallCalculator
                 key={userData ? 'loaded' : 'default'}
-                initialData={overallData || userData?.overall} 
-                onChange={setOverallData} 
+                initialData={overallData || userData?.overall}
+                onChange={setOverallData}
               />
             )}
             {activeTab === 'target' && (
-              <TargetCalculator 
+              <TargetCalculator
                 key={userData ? 'loaded' : 'default'}
-                initialData={targetData || userData?.target} 
-                onChange={setTargetData} 
+                initialData={targetData || userData?.target}
+                onChange={setTargetData}
               />
             )}
             {activeTab === 'simulator' && (

@@ -53,7 +53,7 @@ export default function Navbar() {
                   <LayoutDashboard size={16} /> <span className="hide-mobile">Dashboard</span>
                 </MagneticButton>
               )}
-              
+
               {currentUser !== 'guest' ? (
                 <>
                   <div className="avatar-small" title={currentUser}>

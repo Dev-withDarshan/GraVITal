@@ -26,7 +26,8 @@
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
-  top: 0;
+  top: 52px;
+  /* Set to stick exactly below the global navbar */
   z-index: 100;
 }
 
@@ -38,7 +39,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 60px;
+  height: 48px;
+  /* Reduced from 60px to save vertical height */
   gap: 24px;
 }
 
@@ -127,7 +129,8 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 40px 24px 60px;
+  padding: 20px 24px 40px;
+  /* Reduced from 40px 24px 60px to save vertical height */
   width: 100%;
 }
 

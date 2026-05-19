@@ -5,6 +5,71 @@ import { scanImageForSubjects } from '../utils/ocrParser';
 import AnimatedNumber from './AnimatedNumber';
 import './Calculator.css';
 
+const COURSE_TYPES = [
+  "Theory Only",
+  "Lab Only",
+  "Online Course",
+  "Embedded Theory and Lab",
+  "Soft Skill"
+];
+
+export function parseVtopText(text) {
+  const lines = text.split("\n");
+  const VALID_GRADES = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'N'];
+
+  const subjects = [];
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!/^\d+/.test(trimmed)) return; // only rows starting with number
+
+    const tokens = trimmed.split(/\s+/);
+    if (tokens.length < 9) return; // ignore incomplete rows
+
+    // 👉 Extract from RIGHT
+    const grade = tokens[tokens.length - 1].toUpperCase();
+    
+    // Validate grade
+    if (!VALID_GRADES.includes(grade)) {
+      return; // Skip non-graded or invalid grade rows (like P)
+    }
+
+    const c = parseFloat(tokens[tokens.length - 4]); // Credits (C)
+    if (isNaN(c)) return;
+
+    // 👉 LEFT SIDE
+    const slNo = tokens[0];
+    const courseCode = tokens[1];
+
+    // 👉 MIDDLE PART (title + type)
+    const middle = tokens.slice(2, tokens.length - 7).join(" ");
+
+    let courseType = "";
+    let courseTitle = middle;
+
+    for (let type of COURSE_TYPES) {
+      if (middle.includes(type)) {
+        courseType = type;
+        courseTitle = middle.replace(type, "").trim();
+        break;
+      }
+    }
+
+    const isLab = courseType === "Lab Only" || courseCode.endsWith("P") || courseTitle.toLowerCase().includes("lab");
+    const type = isLab ? "lab" : "theory";
+
+    subjects.push({
+      id: crypto.randomUUID(),
+      name: courseTitle,
+      credits: c,
+      grade: grade,
+      type: type
+    });
+  });
+
+  return subjects;
+}
+
 // VIT Grading System
 const GRADE_POINTS = {
   S: 10, A: 9, B: 8, C: 7, D: 6, E: 5, F: 0, N: 0
@@ -86,6 +151,65 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
   const [scanProgress, setScanProgress] = useState(0);
   const [theoryOpen, setTheoryOpen] = useState(true);
   const [labOpen, setLabOpen] = useState(true);
+  
+  const [isAutofillModalOpen, setIsAutofillModalOpen] = useState(false);
+  const [autofillTab, setAutofillTab] = useState('vtop'); // 'vtop' or 'ocr'
+  const [vtopText, setVtopText] = useState('');
+  const [replaceSubjects, setReplaceSubjects] = useState(true);
+
+  const handleVtopAutofill = () => {
+    if (!vtopText.trim()) {
+      toast.error("Please paste your VTOP grade table first!");
+      return;
+    }
+    
+    try {
+      const parsed = parseVtopText(vtopText);
+      if (parsed.length === 0) {
+        toast.error("No valid subjects detected. Please make sure the table format is correct and contains valid grades (S, A, B, C, D, E, F, N).");
+        return;
+      }
+      
+      const newTheory = parsed.filter(s => s.type === 'theory');
+      const newLab = parsed.filter(s => s.type === 'lab');
+      
+      if (replaceSubjects) {
+        setTheorySubjects(newTheory.length > 0 ? newTheory : DEFAULT_THEORY.map(() => ({ id: crypto.randomUUID(), name: '', credits: 3, grade: 'S' })));
+        setLabSubjects(newLab.length > 0 ? newLab : DEFAULT_LAB.map(() => ({ id: crypto.randomUUID(), name: '', credits: 1, grade: 'S' })));
+      } else {
+        let currentTheory = theorySubjects.length === 5 && theorySubjects[0].name === '' ? [] : [...theorySubjects];
+        let currentLabs = labSubjects.length === 3 && labSubjects[0].name === '' ? [] : [...labSubjects];
+        
+        const existingNames = new Set([...currentTheory, ...currentLabs].map(s => s.name.trim().toLowerCase()));
+        
+        const uniqueNewTheory = [];
+        const uniqueNewLabs = [];
+        
+        newTheory.forEach(s => {
+          if (!existingNames.has(s.name.trim().toLowerCase())) {
+            existingNames.add(s.name.trim().toLowerCase());
+            uniqueNewTheory.push(s);
+          }
+        });
+        
+        newLab.forEach(s => {
+          if (!existingNames.has(s.name.trim().toLowerCase())) {
+            existingNames.add(s.name.trim().toLowerCase());
+            uniqueNewLabs.push(s);
+          }
+        });
+        
+        setTheorySubjects([...currentTheory, ...uniqueNewTheory]);
+        setLabSubjects([...currentLabs, ...uniqueNewLabs]);
+      }
+      
+      toast.success("Subjects auto-filled successfully 🚀");
+      setIsAutofillModalOpen(false);
+      setVtopText('');
+    } catch (err) {
+      toast.error("Failed to parse VTOP text: " + err.message);
+    }
+  };
 
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
@@ -378,28 +502,31 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
 
         {/* Center — Stats */}
         <div className="sem-hero-center">
-          <div className="sem-hero-medal">
-            <Award size={40} />
-          </div>
-          <div className="sem-hero-stat">
-            <span className="sem-stat-icon"><BarChart3 size={16} /></span>
-            <div>
-              <span className="sem-stat-label">TOTAL CREDITS</span>
-              <span className="sem-stat-num">{currentCredits}</span>
-              <span className="sem-stat-unit">Credits</span>
+          <div className="sem-hero-stats-row">
+            <div className="sem-hero-stat">
+              <span className="sem-stat-icon"><BarChart3 size={14} /></span>
+              <div className="sem-stat-info">
+                <span className="sem-stat-label">TOTAL CREDITS</span>
+                <div className="sem-stat-value-group">
+                  <span className="sem-stat-num">{currentCredits}</span>
+                  <span className="sem-stat-unit">Credits</span>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="sem-hero-stat">
-            <span className="sem-stat-icon"><Award size={16} /></span>
-            <div>
-              <span className="sem-stat-label">AVERAGE GRADE</span>
-              <span className="sem-stat-num">{avgGrade.letter}</span>
-              <span className="sem-stat-unit">{avgGrade.word}</span>
+            <div className="sem-hero-stat">
+              <span className="sem-stat-icon"><Award size={14} /></span>
+              <div className="sem-stat-info">
+                <span className="sem-stat-label">AVERAGE GRADE</span>
+                <div className="sem-stat-value-group">
+                  <span className="sem-stat-num">{avgGrade.letter}</span>
+                  <span className="sem-stat-unit">{avgGrade.word}</span>
+                </div>
+              </div>
             </div>
           </div>
           {onAddToCGPA && (
             <button className="btn-primary sem-add-cgpa-btn" onClick={() => onAddToCGPA(currentCredits, currentCgpa)}>
-              <Plus size={16} /> Add to CGPA
+              <Plus size={14} /> Add to CGPA
             </button>
           )}
         </div>
@@ -407,15 +534,17 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
         {/* Right — Donut Overview */}
         <div className="sem-hero-right">
           <span className="sem-overview-label">SEMESTER OVERVIEW</span>
-          <DonutChart theoryCount={theorySubjects.length} labCount={labSubjects.length} size={140} />
-          <div className="sem-overview-legend">
-            <div className="sem-legend-item">
-              <span className="sem-legend-dot" style={{ background: '#6366F1' }} />
-              Theory Subjects <strong>{theorySubjects.length}</strong>
-            </div>
-            <div className="sem-legend-item">
-              <span className="sem-legend-dot" style={{ background: '#22D3EE' }} />
-              Lab Subjects <strong>{labSubjects.length}</strong>
+          <div className="sem-overview-content">
+            <DonutChart theoryCount={theorySubjects.length} labCount={labSubjects.length} size={90} />
+            <div className="sem-overview-legend">
+              <div className="sem-legend-item">
+                <span className="sem-legend-dot" style={{ background: '#6366F1' }} />
+                <span className="sem-legend-text">Theory: <strong>{theorySubjects.length}</strong></span>
+              </div>
+              <div className="sem-legend-item">
+                <span className="sem-legend-dot" style={{ background: '#22D3EE' }} />
+                <span className="sem-legend-text">Labs: <strong>{labSubjects.length}</strong></span>
+              </div>
             </div>
           </div>
         </div>
@@ -433,18 +562,15 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
           </div>
         </div>
         <div className="sem-config-actions">
-          <div style={{ position: 'relative' }}>
-            <input type="file" id="ocr-upload" accept="image/*" multiple style={{ display: 'none' }}
-              onChange={handleImageUpload} disabled={isScanning} />
-            <label htmlFor="ocr-upload" className="sem-action-btn sem-btn-auto"
-              style={{ cursor: isScanning ? 'not-allowed' : 'pointer', opacity: isScanning ? 0.6 : 1 }}>
-              {isScanning ? (
-                <><Loader2 size={16} className="animate-spin" /> Scanning ({scanProgress}%)</>
-              ) : (
-                <><Sparkles size={16} /> Auto-Fill</>
-              )}
-            </label>
-          </div>
+          {isScanning ? (
+            <div className="sem-action-btn sem-btn-auto" style={{ opacity: 0.6, cursor: 'not-allowed' }}>
+              <Loader2 size={16} className="animate-spin" /> Scanning ({scanProgress}%)
+            </div>
+          ) : (
+            <button className="sem-action-btn sem-btn-auto" onClick={() => setIsAutofillModalOpen(true)}>
+              <Sparkles size={16} /> Auto-Fill
+            </button>
+          )}
           <button className="sem-action-btn sem-btn-clear" onClick={clearAll}>
             <RotateCcw size={16} /> Clear All
           </button>
@@ -500,6 +626,93 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
           <option key={c} value={c} />
         ))}
       </datalist>
+
+      {/* ─── VTOP AUTOFILL MODAL ─── */}
+      {isAutofillModalOpen && (
+        <div className="autofill-modal-overlay" onClick={(e) => {
+          if (e.target.className === 'autofill-modal-overlay') setIsAutofillModalOpen(false);
+        }}>
+          <div className="autofill-modal-card animate-scale-in">
+            <div className="autofill-modal-header">
+              <div className="autofill-modal-title-group">
+                <Sparkles size={20} className="autofill-modal-icon" />
+                <h3 className="autofill-modal-title">Auto-Fill Semester Subjects</h3>
+              </div>
+              <button className="autofill-modal-close" onClick={() => setIsAutofillModalOpen(false)}>×</button>
+            </div>
+            
+            <div className="autofill-modal-tabs">
+              <button 
+                className={`autofill-tab ${autofillTab === 'vtop' ? 'active' : ''}`}
+                onClick={() => setAutofillTab('vtop')}
+              >
+                Paste VTOP Text
+              </button>
+              <button 
+                className={`autofill-tab ${autofillTab === 'ocr' ? 'active' : ''}`}
+                onClick={() => setAutofillTab('ocr')}
+              >
+                Scan Screenshot
+              </button>
+            </div>
+
+            <div className="autofill-modal-body">
+              {autofillTab === 'vtop' ? (
+                <div className="vtop-autofill-pane">
+                  <p className="autofill-pane-desc">
+                    Log in to VTOP, copy your entire grade table (including the headers or row numbers), and paste it below.
+                  </p>
+                  <label className="vtop-textarea-label">Paste your VTOP Grade Table here</label>
+                  <textarea
+                    className="vtop-textarea"
+                    placeholder="Example:&#10;1&#9;BCHY102N&#9;Environmental Sciences&#9;Online Course&#9;0.0&#9;0.0&#9;0.0&#9;2.0&#9;AG&#9;71&#9;P&#10;2&#9;BCSE103E&#9;Computer Programming: Java&#9;Embedded Theory and Lab&#9;1.0&#9;2.0&#9;0.0&#9;3.0&#9;AG&#9;92&#9;S"
+                    value={vtopText}
+                    onChange={(e) => setVtopText(e.target.value)}
+                  />
+                  <div className="autofill-options">
+                    <label className="autofill-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={replaceSubjects}
+                        onChange={(e) => setReplaceSubjects(e.target.checked)}
+                      />
+                      <span>Replace existing subjects (otherwise append)</span>
+                    </label>
+                  </div>
+                  <button className="btn-primary vtop-submit-btn" onClick={handleVtopAutofill}>
+                    Auto Fill Subjects
+                  </button>
+                </div>
+              ) : (
+                <div className="ocr-autofill-pane">
+                  <p className="autofill-pane-desc">
+                    Upload or drag screenshots of your VTOP grade page to automatically scan and import course codes, names, credits, and grades.
+                  </p>
+                  <div className="ocr-dropzone">
+                    <input
+                      type="file"
+                      id="ocr-upload"
+                      accept="image/*"
+                      multiple
+                      className="ocr-file-input"
+                      onChange={(e) => {
+                        handleImageUpload(e);
+                        setIsAutofillModalOpen(false);
+                      }}
+                      disabled={isScanning}
+                    />
+                    <label htmlFor="ocr-upload" className="ocr-dropzone-label">
+                      <UploadCloud size={40} className="ocr-dropzone-icon" />
+                      <span className="ocr-dropzone-text">Click to choose image files</span>
+                      <span className="ocr-dropzone-sub">Supports multiple screenshots</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
