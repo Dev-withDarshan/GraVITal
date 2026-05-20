@@ -172,10 +172,10 @@ function SemesterCard({ sem, index, semesters, onUpdate, onRemove, expanded, onT
     const creds = Number(sem.totalCredits) || 0;
     const newTotalCredits = baseCredits + creds;
     const predictedCGPA = newTotalCredits > 0 ? (basePoints + (hypotheticalGPA * creds)) / newTotalCredits : 0;
-    
+
     const currentTotalCredits = baseCredits + effectiveCredits;
     const currentCGPA = currentTotalCredits > 0 ? (basePoints + (effectiveGPA * effectiveCredits)) / currentTotalCredits : 0;
-    
+
     const delta = predictedCGPA - currentCGPA;
     const isPositive = delta > 0;
     const isNegative = delta < 0;
@@ -199,7 +199,7 @@ function SemesterCard({ sem, index, semesters, onUpdate, onRemove, expanded, onT
 
   return (
     <div className={`sem-card glass-panel w-full animate-fade-in ${!sem.isIncluded ? 'sem-excluded' : ''} ${expanded ? 'expanded' : ''}`}>
-      
+
       {/* ── ALWAYS VISIBLE HEADER ── */}
       <div className="sem-card-header hover:bg-white/5 transition-colors duration-200" onClick={onToggle}>
         <div className="sem-header-left">
@@ -247,7 +247,7 @@ function SemesterCard({ sem, index, semesters, onUpdate, onRemove, expanded, onT
       {/* ── COLLAPSIBLE CONTENT WRAPPER ── */}
       {expanded && (
         <div className="sem-card-body w-full col-span-full flex flex-col gap-4">
-          
+
           {/* Mode Toggle (Segmented Control) */}
           <div className="mode-toggle-group">
             <button
@@ -494,7 +494,7 @@ export default function OverallCalculator({ initialData, onChange }) {
       semesters: semesters,
       computedOverallCgpa: currentOverallCgpa
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [semesters, currentOverallCgpa]);
 
   // --- Semester CRUD ---
@@ -529,21 +529,21 @@ export default function OverallCalculator({ initialData, onChange }) {
     <div className="calculator-container saas-dashboard">
       {/* ── TOP SECTION (GRID) ── */}
       <div className="dashboard-top-grid animate-fade-in stagger-1">
-        
+
         {/* 1. HERO CARD */}
         <div className="hero-card glass-panel">
           <div className="hero-content">
             <h3 className="hero-subtitle">Overall Cumulative CGPA</h3>
             <AnimatedNumber value={currentOverallCgpa} decimals={4} className="hero-cgpa-value smooth-gradient-text" />
-            
+
             <div className={`performance-badge ${performanceBadge.class}`}>
               {performanceBadge.text}
             </div>
-            
+
             <p className="hero-insight">
               You're in the <span className="highlight-text">top 10%</span> of students
             </p>
-            
+
             <div className="progress-container">
               <div className="progress-bar-wrapper">
                 <div className="progress-bar-fill" style={{ width: `${targetPercentage}%` }}></div>
@@ -573,7 +573,7 @@ export default function OverallCalculator({ initialData, onChange }) {
             <div className="stat-card-value">{overallCredits}</div>
             <div className="stat-card-desc">Credits Completed</div>
           </div>
-          
+
           {/* TREND CARD */}
           <div className="stat-card glass-panel">
             <div className="stat-card-header">

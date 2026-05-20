@@ -18,6 +18,9 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  const isAuthenticated = !!currentUser && currentUser !== 'guest';
+  const isGuest = currentUser === 'guest';
+
   const handleLogoClick = () => {
     navigate('/');
   };
@@ -66,9 +69,11 @@ export default function Navbar() {
       <div className="navbar-inner">
         {/* ── LEFT: Logo ── */}
         <div className="navbar-left">
-          <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          {(isAuthenticated || isGuest) && (
+            <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          )}
           <div className="nav-brand-clickable" onClick={handleLogoClick}>
             <img src="/Logo.png" alt="ScoreLoom Logo" className="navbar-logo" />
             <span className="brand-text">Score<span className="smooth-gradient-text">Loom</span></span>
@@ -77,17 +82,19 @@ export default function Navbar() {
 
         {/* ── CENTER: Navigation Tabs ── */}
         <div className="navbar-center">
-          <div className="nav-tabs-container">
-            {navTabs.map((tab) => (
-              <button
-                key={tab.key}
-                className={`nav-tab ${isOnDashboard && activeTab === tab.key ? 'nav-tab-active' : ''}`}
-                onClick={() => handleTabClick(tab)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          {(isAuthenticated || isGuest) && (
+            <div className="nav-tabs-container">
+              {navTabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  className={`nav-tab ${isOnDashboard && activeTab === tab.key ? 'nav-tab-active' : ''}`}
+                  onClick={() => handleTabClick(tab)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── RIGHT: Actions ── */}
@@ -181,7 +188,7 @@ export default function Navbar() {
       </div>
 
       {/* ── Mobile Slide-Down Nav ── */}
-      {mobileMenuOpen && (
+      {(isAuthenticated || isGuest) && mobileMenuOpen && (
         <div className="mobile-nav-drawer animate-fade-in">
           {navTabs.map((tab) => (
             <button

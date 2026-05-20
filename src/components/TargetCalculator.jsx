@@ -53,12 +53,12 @@ export default function TargetCalculator({ initialData, onChange }) {
         nextSemCredits
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCredits, currentCGPA, targetCGPA, nextSemCredits]);
 
   const calculateRequiredGPA = () => {
     if (!currentCredits || !currentCGPA || !targetCGPA || !nextSemCredits) return null;
-    
+
     const currCred = Number(currentCredits);
     const currCGPA = Number(currentCGPA);
     const tarCGPA = Number(targetCGPA);

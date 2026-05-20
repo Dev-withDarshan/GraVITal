@@ -8,7 +8,7 @@ import { SpotlightCard, MagneticButton } from './Spotlight';
 // Component for sub-pixel localized text brightening
 const InteractiveText = ({ children, as: Component = 'div', className = '' }) => {
   const ref = React.useRef(null);
-  
+
   const onMove = React.useCallback((e) => {
     const el = ref.current;
     if (!el) return;
@@ -23,8 +23,8 @@ const InteractiveText = ({ children, as: Component = 'div', className = '' }) =>
   }, []);
 
   return (
-    <Component 
-      className={`interactive-text-container ${className}`} 
+    <Component
+      className={`interactive-text-container ${className}`}
       ref={ref}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
@@ -42,33 +42,38 @@ const InteractiveText = ({ children, as: Component = 'div', className = '' }) =>
 export default function LandingPage() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  
+
   // Treat guests as logged out for the sake of the landing page UI
   const isRealUser = currentUser && currentUser !== 'guest';
+
+  // Capitalize user's name dynamically (e.g., "darshan" -> "Darshan")
+  const formattedName = currentUser
+    ? currentUser.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+    : '';
 
   return (
     <>
       <div className="landing-container animate-fade-in">
-        
+
         {/* Hero Section */}
         <header className="hero-section">
           <div className="hero-badge">Cloud-Powered Academic Engine 🚀</div>
           <InteractiveText className="hero-text-block">
             <h1 className="hero-title">
               {isRealUser ? (
-                <>Welcome back, <br /><span className="smooth-gradient-text">{currentUser} 👋</span></>
+                <>Welcome back, <br /><span className="smooth-gradient-text">{formattedName}</span>👋</>
               ) : (
                 <>Weave Your <br /><span className="smooth-gradient-text">Academic Future</span></>
               )}
             </h1>
             <p className="hero-subtitle">
-              {isRealUser 
-                ? "Ready to update your grades or view your cumulative progress? Your dashboard is just a click away."
+              {isRealUser
+                ? "Let’s continue building your academic edge."
                 : "Calculate semester GPA, track cumulative CGPA, plan target scores, and simulate grade changes — all in one modern dashboard."
               }
             </p>
           </InteractiveText>
-          
+
           <div className="hero-actions">
             {isRealUser ? (
               <MagneticButton

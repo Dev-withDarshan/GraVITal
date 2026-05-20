@@ -28,7 +28,7 @@ export function parseVtopText(text) {
 
     // 👉 Extract from RIGHT
     const grade = tokens[tokens.length - 1].toUpperCase();
-    
+
     // Validate grade
     if (!VALID_GRADES.includes(grade)) {
       return; // Skip non-graded or invalid grade rows (like P)
@@ -78,10 +78,10 @@ const GRADE_POINTS = {
 const DEFAULT_THEORY = Array.from({ length: 5 }, () => ({ id: crypto.randomUUID(), name: '', credits: 3, grade: 'S' }));
 const DEFAULT_LAB = Array.from({ length: 3 }, () => ({ id: crypto.randomUUID(), name: '', credits: 1, grade: 'S' }));
 
-const ROW_COLORS = ['#EC4899','#F97316','#14B8A6','#6366F1','#A855F7','#10B981','#F59E0B','#3B82F6','#EF4444','#8B5CF6'];
+const ROW_COLORS = ['#EC4899', '#F97316', '#14B8A6', '#6366F1', '#A855F7', '#10B981', '#F59E0B', '#3B82F6', '#EF4444', '#8B5CF6'];
 
 const getGradeQuality = (grade) => {
-  const map = { S:'Excellent', A:'Very Good', B:'Good', C:'Average', D:'Below Avg', E:'Poor', F:'Fail', N:'Absent' };
+  const map = { S: 'Excellent', A: 'Very Good', B: 'Good', C: 'Average', D: 'Below Avg', E: 'Poor', F: 'Fail', N: 'Absent' };
   return map[grade] || '';
 };
 
@@ -151,7 +151,7 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
   const [scanProgress, setScanProgress] = useState(0);
   const [theoryOpen, setTheoryOpen] = useState(true);
   const [labOpen, setLabOpen] = useState(true);
-  
+
   const [isAutofillModalOpen, setIsAutofillModalOpen] = useState(false);
   const [autofillTab, setAutofillTab] = useState('vtop'); // 'vtop' or 'ocr'
   const [vtopText, setVtopText] = useState('');
@@ -162,47 +162,47 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
       toast.error("Please paste your VTOP grade table first!");
       return;
     }
-    
+
     try {
       const parsed = parseVtopText(vtopText);
       if (parsed.length === 0) {
         toast.error("No valid subjects detected. Please make sure the table format is correct and contains valid grades (S, A, B, C, D, E, F, N).");
         return;
       }
-      
+
       const newTheory = parsed.filter(s => s.type === 'theory');
       const newLab = parsed.filter(s => s.type === 'lab');
-      
+
       if (replaceSubjects) {
         setTheorySubjects(newTheory.length > 0 ? newTheory : DEFAULT_THEORY.map(() => ({ id: crypto.randomUUID(), name: '', credits: 3, grade: 'S' })));
         setLabSubjects(newLab.length > 0 ? newLab : DEFAULT_LAB.map(() => ({ id: crypto.randomUUID(), name: '', credits: 1, grade: 'S' })));
       } else {
-        let currentTheory = theorySubjects.length === 5 && theorySubjects[0].name === '' ? [] : [...theorySubjects];
-        let currentLabs = labSubjects.length === 3 && labSubjects[0].name === '' ? [] : [...labSubjects];
-        
+        let currentTheory = theorySubjects.length === 2 && theorySubjects[0].name === '' ? [] : [...theorySubjects];
+        let currentLabs = labSubjects.length === 1 && labSubjects[0].name === '' ? [] : [...labSubjects];
+
         const existingNames = new Set([...currentTheory, ...currentLabs].map(s => s.name.trim().toLowerCase()));
-        
+
         const uniqueNewTheory = [];
         const uniqueNewLabs = [];
-        
+
         newTheory.forEach(s => {
           if (!existingNames.has(s.name.trim().toLowerCase())) {
             existingNames.add(s.name.trim().toLowerCase());
             uniqueNewTheory.push(s);
           }
         });
-        
+
         newLab.forEach(s => {
           if (!existingNames.has(s.name.trim().toLowerCase())) {
             existingNames.add(s.name.trim().toLowerCase());
             uniqueNewLabs.push(s);
           }
         });
-        
+
         setTheorySubjects([...currentTheory, ...uniqueNewTheory]);
         setLabSubjects([...currentLabs, ...uniqueNewLabs]);
       }
-      
+
       toast.success("Subjects auto-filled successfully 🚀");
       setIsAutofillModalOpen(false);
       setVtopText('');
@@ -301,7 +301,7 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
 
   useEffect(() => {
     onChange({ theory: theorySubjects, lab: labSubjects, computedSemCgpa: currentCgpa });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theorySubjects, labSubjects, currentCgpa]);
 
   const addSubject = (type) => {
@@ -397,7 +397,6 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
                                 value={sub.name}
                                 onChange={(e) => updateSubject(type, sub.id, 'name', e.target.value)}
                               />
-                              <span className="sem-quality-label" style={{ color }}>{qualLabel}</span>
                             </div>
                           </div>
                         </td>
@@ -449,7 +448,7 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
                 </tbody>
               </table>
             </div>
-            
+
             {/* Add Subject Button */}
             <div style={{ padding: '16px', display: 'flex', justifyContent: 'center', borderTop: '1px solid var(--card-border)' }}>
               <button className="sem-action-btn sem-btn-add" onClick={() => addSubject(type)}>
@@ -640,15 +639,15 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
               </div>
               <button className="autofill-modal-close" onClick={() => setIsAutofillModalOpen(false)}>×</button>
             </div>
-            
+
             <div className="autofill-modal-tabs">
-              <button 
+              <button
                 className={`autofill-tab ${autofillTab === 'vtop' ? 'active' : ''}`}
                 onClick={() => setAutofillTab('vtop')}
               >
                 Paste VTOP Text
               </button>
-              <button 
+              <button
                 className={`autofill-tab ${autofillTab === 'ocr' ? 'active' : ''}`}
                 onClick={() => setAutofillTab('ocr')}
               >

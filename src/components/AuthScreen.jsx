@@ -10,6 +10,7 @@ export default function AuthScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   
   const { login, signup, loginAsGuest } = useAuth();
   const navigate = useNavigate();
@@ -26,9 +27,19 @@ export default function AuthScreen() {
     const normalizedUsername = username.trim().toLowerCase();
     
     if (isLogin) {
-      const res = await login(normalizedUsername, password);
-      if (!res.success) setError(res.error);
-      else navigate('/dashboard');
+      setLoading(true);
+      try {
+        const res = await login(normalizedUsername, password);
+        if (!res.success) {
+          setError(res.error);
+        } else {
+          navigate('/dashboard');
+        }
+      } catch (err) {
+        setError('An unexpected error occurred');
+      } finally {
+        setLoading(false);
+      }
     } else {
       const res = await signup(normalizedUsername, password);
       if (!res.success) setError(res.error);
@@ -89,9 +100,14 @@ export default function AuthScreen() {
             </div>
           </div>
 
-          <button type="submit" className="btn-primary auth-submit">
-            {isLogin ? <LogIn size={18} /> : <UserPlus size={18} />}
-            {isLogin ? 'Log In' : 'Sign Up'}
+
+          <button 
+            type="submit" 
+            className="btn-primary auth-submit"
+            disabled={loading}
+          >
+            {!loading && (isLogin ? <LogIn size={18} /> : <UserPlus size={18} />)}
+            {isLogin ? (loading ? "Signing you in..." : "Log In") : "Sign Up"}
           </button>
         </form>
 
