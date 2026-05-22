@@ -75,8 +75,8 @@ const GRADE_POINTS = {
   S: 10, A: 9, B: 8, C: 7, D: 6, E: 5, F: 0, N: 0
 };
 
-const DEFAULT_THEORY = Array.from({ length: 5 }, () => ({ id: crypto.randomUUID(), name: '', credits: 3, grade: 'S' }));
-const DEFAULT_LAB = Array.from({ length: 3 }, () => ({ id: crypto.randomUUID(), name: '', credits: 1, grade: 'S' }));
+const DEFAULT_THEORY = Array.from({ length: 3 }, () => ({ id: crypto.randomUUID(), name: '', credits: 3, grade: 'S' }));
+const DEFAULT_LAB = Array.from({ length: 1 }, () => ({ id: crypto.randomUUID(), name: '', credits: 1, grade: 'S' }));
 
 const ROW_COLORS = ['#EC4899', '#F97316', '#14B8A6', '#6366F1', '#A855F7', '#10B981', '#F59E0B', '#3B82F6', '#EF4444', '#8B5CF6'];
 
@@ -177,8 +177,8 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
         setTheorySubjects(newTheory.length > 0 ? newTheory : DEFAULT_THEORY.map(() => ({ id: crypto.randomUUID(), name: '', credits: 3, grade: 'S' })));
         setLabSubjects(newLab.length > 0 ? newLab : DEFAULT_LAB.map(() => ({ id: crypto.randomUUID(), name: '', credits: 1, grade: 'S' })));
       } else {
-        let currentTheory = theorySubjects.length === 2 && theorySubjects[0].name === '' ? [] : [...theorySubjects];
-        let currentLabs = labSubjects.length === 1 && labSubjects[0].name === '' ? [] : [...labSubjects];
+        let currentTheory = theorySubjects.length === DEFAULT_THEORY.length && theorySubjects[0].name === '' ? [] : [...theorySubjects];
+        let currentLabs = labSubjects.length === DEFAULT_LAB.length && labSubjects[0].name === '' ? [] : [...labSubjects];
 
         const existingNames = new Set([...currentTheory, ...currentLabs].map(s => s.name.trim().toLowerCase()));
 
@@ -227,8 +227,8 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
         allExtractedSubjects.push(...extracted);
       }
       if (allExtractedSubjects.length > 0) {
-        let currentTheory = theorySubjects.length === 5 && theorySubjects[0].name === '' ? [] : [...theorySubjects];
-        let currentLabs = labSubjects.length === 3 && labSubjects[0].name === '' ? [] : [...labSubjects];
+        let currentTheory = theorySubjects.length === DEFAULT_THEORY.length && theorySubjects[0].name === '' ? [] : [...theorySubjects];
+        let currentLabs = labSubjects.length === DEFAULT_LAB.length && labSubjects[0].name === '' ? [] : [...labSubjects];
         const existingNames = new Set([...currentTheory, ...currentLabs].map(s => s.name.trim().toLowerCase()));
         const uniqueNewTheory = [];
         const uniqueNewLabs = [];
@@ -449,20 +449,21 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
               </table>
             </div>
 
-            {/* Add Subject Button */}
-            <div style={{ padding: '16px', display: 'flex', justifyContent: 'center', borderTop: '1px solid var(--card-border)' }}>
-              <button className="sem-action-btn sem-btn-add" onClick={() => addSubject(type)}>
-                <Plus size={16} /> Add {isTheory ? 'Theory' : 'Lab'} Subject
-              </button>
-            </div>
-
             {/* Section Summary */}
-            <div className="sem-section-summary">
-              <div className="sem-summary-icon">
-                <Icon size={16} />
+            <div className="sem-section-summary flex items-center w-full" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+              <div className="sem-summary-icon" style={{ display: 'flex', alignItems: 'center' }}>
+                <Icon size={16} fill="none" />
                 <span>{isTheory ? 'Theory' : 'Lab'} Summary</span>
               </div>
-              <div className="sem-summary-stats">
+
+              {/* Centered Add Button */}
+              <div className="flex justify-center flex-1" style={{ display: 'flex', justifyContent: 'center', flex: 1 }}>
+                <button className="sem-action-btn sem-btn-add" onClick={() => addSubject(type)} style={{ margin: 0 }}>
+                  <Plus size={16} /> Add {isTheory ? 'Theory' : 'Lab'} Subject
+                </button>
+              </div>
+
+              <div className="sem-summary-stats flex items-center gap-6">
                 <span><strong>{stats.credits}</strong> Credits</span>
                 <span><strong>{stats.count}</strong> Subjects</span>
                 <span><strong>{stats.points.toFixed(2)}</strong> Total Points</span>
@@ -481,11 +482,11 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
       {/* ═══════════════════════════════════════
           HERO SECTION — GPA + Overview
           ═══════════════════════════════════════ */}
-      <div className="sem-hero animate-fade-in stagger-1">
+      <div className="hero-dashboard-card animate-fade-in stagger-1">
         {/* Left — GPA Display */}
         <div className="sem-hero-left">
           <span className="sem-hero-label">SEMESTER GPA</span>
-          <AnimatedNumber value={currentCgpa} decimals={4} className="sem-hero-gpa smooth-gradient-text" />
+          <AnimatedNumber value={currentCgpa} decimals={4} className="sem-hero-gpa blue-glow-text" />
           <div className="sem-quality-badge" style={{ background: `${quality.color}18`, color: quality.color, borderColor: `${quality.color}40` }}>
             {quality.label}
           </div>
@@ -503,24 +504,20 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
         <div className="sem-hero-center">
           <div className="sem-hero-stats-row">
             <div className="sem-hero-stat">
-              <span className="sem-stat-icon"><BarChart3 size={14} /></span>
-              <div className="sem-stat-info">
-                <span className="sem-stat-label">TOTAL CREDITS</span>
-                <div className="sem-stat-value-group">
-                  <span className="sem-stat-num">{currentCredits}</span>
-                  <span className="sem-stat-unit">Credits</span>
-                </div>
+              <div className="sem-stat-icon-wrapper">
+                <BarChart3 size={14} className="sem-stat-icon" />
               </div>
+              <span className="sem-stat-label">TOTAL CREDITS</span>
+              <span className="sem-stat-num">{currentCredits}</span>
+              <span className="sem-stat-unit">Credits</span>
             </div>
             <div className="sem-hero-stat">
-              <span className="sem-stat-icon"><Award size={14} /></span>
-              <div className="sem-stat-info">
-                <span className="sem-stat-label">AVERAGE GRADE</span>
-                <div className="sem-stat-value-group">
-                  <span className="sem-stat-num">{avgGrade.letter}</span>
-                  <span className="sem-stat-unit">{avgGrade.word}</span>
-                </div>
+              <div className="sem-stat-icon-wrapper">
+                <Award size={14} className="sem-stat-icon" />
               </div>
+              <span className="sem-stat-label">AVERAGE GRADE</span>
+              <span className="sem-stat-num">{avgGrade.letter}</span>
+              <span className="sem-stat-unit">{avgGrade.word}</span>
             </div>
           </div>
           {onAddToCGPA && (

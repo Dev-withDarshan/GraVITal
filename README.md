@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/MongoDB-In--Memory-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
 </p>
 
-<h1 align="center">⬡ ScoreLoom</h1>
+<h1 align="center">⬡ GraVITal</h1>
 <p align="center"><em>Weave Your Academic Future</em></p>
 
 <p align="center">
@@ -78,7 +78,7 @@
 ## 📁 Project Structure
 
 ```
-ScoreLoom/
+GraVITal/
 ├── backend/
 │   └── server.js              # Express API (auth + data endpoints)
 ├── public/

@@ -19,7 +19,7 @@ const registerHandler = async (req, res) => {
       username: username.toLowerCase() 
     });
     if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
+      return res.status(400).json({ error: "User already exists. Please choose a different username." });
     }
 
     const user = new User({ 

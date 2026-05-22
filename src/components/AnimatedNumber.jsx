@@ -16,10 +16,10 @@ export default function AnimatedNumber({ value, decimals = 2, className = '', st
     const step = (timestamp) => {
       if (!startTimestamp) startTimestamp = timestamp;
       const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      
+
       // easeOutQuart
       const easeProgress = 1 - Math.pow(1 - progress, 4);
-      
+
       const currentVal = initialValue + (targetValue - initialValue) * easeProgress;
       setDisplayValue(currentVal);
 
@@ -33,11 +33,11 @@ export default function AnimatedNumber({ value, decimals = 2, className = '', st
     };
 
     window.requestAnimationFrame(step);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  const updateClass = isUpdating 
-    ? (parseFloat(value) > displayValue ? 'value-increase' : 'value-decrease') 
+  const updateClass = isUpdating
+    ? (parseFloat(value) > displayValue ? 'value-increase' : 'value-decrease')
     : '';
 
   return (

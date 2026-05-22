@@ -3,12 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useDashboardTab } from '../context/DashboardTabContext';
-import { LogIn, LogOut, LayoutDashboard, Sun, Moon, ChevronDown, Menu, X, Save } from 'lucide-react';
+import { LogIn, LogOut, LayoutDashboard, Sun, Moon, ChevronDown, Menu, X, Save, User } from 'lucide-react';
 import { MagneticButton } from './Spotlight';
+import { capitalizeName } from '../utils/helpers';
 import './Navbar.css';
 
 export default function Navbar() {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, profileData } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { activeTab, setActiveTab, onSave, saveStatus } = useDashboardTab();
   const navigate = useNavigate();
@@ -75,8 +76,8 @@ export default function Navbar() {
             </button>
           )}
           <div className="nav-brand-clickable" onClick={handleLogoClick}>
-            <img src="/Logo.png" alt="ScoreLoom Logo" className="navbar-logo" />
-            <span className="brand-text">Score<span className="smooth-gradient-text">Loom</span></span>
+            <img src="/Logo.png" alt="GraVITal Logo" className="navbar-logo" />
+            <span className="brand-text">Gra<span className="smooth-gradient-text">VIT</span>al</span>
           </div>
         </div>
 
@@ -129,8 +130,14 @@ export default function Navbar() {
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     aria-label="Profile menu"
                   >
-                    <div className="avatar-small" title={currentUser}>
-                      {currentUser.charAt(0).toUpperCase()}
+                    <div className="avatar-small" title={profileData.name || currentUser}>
+                      {profileData.profilePhoto ? (
+                        <img src={profileData.profilePhoto} alt={profileData.name || currentUser} className="avatar-img-small" />
+                      ) : (
+                        <div className="avatar-fallback-gradient">
+                          {(profileData.name || currentUser).charAt(0).toUpperCase()}
+                        </div>
+                      )}
                     </div>
                     <ChevronDown size={14} className={`avatar-chevron ${dropdownOpen ? 'avatar-chevron-open' : ''}`} />
                   </button>
@@ -140,17 +147,23 @@ export default function Navbar() {
                     <div className="avatar-dropdown animate-scale-in">
                       <div className="dropdown-user-info">
                         <div className="dropdown-avatar">
-                          {currentUser.charAt(0).toUpperCase()}
+                          {profileData.profilePhoto ? (
+                            <img src={profileData.profilePhoto} alt={profileData.name || currentUser} className="dropdown-avatar-img" />
+                          ) : (
+                            <div className="avatar-fallback-gradient w-full h-full flex items-center justify-center">
+                              {(profileData.name || currentUser).charAt(0).toUpperCase()}
+                            </div>
+                          )}
                         </div>
                         <div className="dropdown-user-details">
-                          <span className="dropdown-user-name">{currentUser}</span>
-                          <span className="dropdown-user-email">{currentUser}@scoreloom.app</span>
+                          <span className="dropdown-user-name">{capitalizeName(profileData.name || currentUser)}</span>
+                          <span className="dropdown-user-email">{profileData.email || `${currentUser}@gmail.com`}</span>
                         </div>
                       </div>
                       <div className="dropdown-divider" />
-                      <button className="dropdown-item" onClick={() => { navigate('/dashboard'); setDropdownOpen(false); }}>
-                        <LayoutDashboard size={16} />
-                        <span>Dashboard</span>
+                      <button className="dropdown-item" onClick={() => { navigate('/profile'); setDropdownOpen(false); }}>
+                        <User size={16} />
+                        <span>Profile</span>
                       </button>
                       <button className="dropdown-item dropdown-item-danger" onClick={() => { handleLogout(); setDropdownOpen(false); }}>
                         <LogOut size={16} />

@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import LandingPage from './components/LandingPage';
 import AuthScreen from './components/AuthScreen';
 import Dashboard from './components/Dashboard';
+import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import ParticleBackground from './components/ParticleBackground';
 
@@ -20,20 +21,30 @@ const AppLayout = () => {
     <>
       {showParticles && <ParticleBackground />}
       <Navbar />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<AuthScreen />} />
-        <Route 
-          path="/dashboard" 
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } 
-        />
-        {/* Render landing page for unknown routes */}
-        <Route path="*" element={<LandingPage />} />
-      </Routes>
+      <div key={location.pathname} className="animate-mac-micromotion" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<AuthScreen />} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          {/* Render landing page for unknown routes */}
+          <Route path="*" element={<LandingPage />} />
+        </Routes>
+      </div>
     </>
   );
 };

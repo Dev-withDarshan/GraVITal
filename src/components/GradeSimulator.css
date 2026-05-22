@@ -110,31 +110,50 @@
 .sim-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
+  min-width: 100%; /* Spans full container width */
 }
 
 .sim-table th {
   text-align: left;
-  padding: 12px 14px;
+  padding: 8px 14px 14px 14px;
   color: var(--text-muted);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   border-bottom: 1px solid var(--border-color);
+  opacity: 0.9;
 }
 
 .sim-table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--card-border);
+  padding: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.sim-table td:first-child { width: 28%; }
-.sim-table td:nth-child(2) { width: 10%; }
-.sim-table td:nth-child(3) { width: 18%; }
-.sim-table td:nth-child(4) { width: 22%; }
-.sim-table td:nth-child(5) { width: 14%; }
-.sim-table td:last-child { width: 8%; text-align: right; }
+.sim-table td:first-child {
+  width: 35%;
+}
+
+.sim-table td:nth-child(2) {
+  width: 12%;
+}
+
+.sim-table td:nth-child(3) {
+  width: 20%;
+}
+
+.sim-table td:nth-child(4) {
+  width: 20%;
+}
+
+.sim-table td:nth-child(5) {
+  width: 8%;
+}
+
+.sim-table td:last-child {
+  width: 5%;
+  text-align: right;
+}
 
 /* ─── Sim Grade Control ─── */
 .sim-grade-control {
@@ -217,10 +236,11 @@
   .simulator-header {
     flex-direction: column;
     text-align: center;
-    padding: 24px;
+    padding: 20px 16px;
     border-left: none;
     border-top: 4px solid var(--accent-color);
     gap: 16px;
+    border-radius: 16px;
   }
 
   .sim-stat-group {
@@ -240,8 +260,13 @@
     display: none;
   }
 
+  .simulator-table-section {
+    padding: 16px 12px;
+  }
+
   /* Table → Card layout */
-  .sim-table, .sim-table tbody {
+  .sim-table,
+  .sim-table tbody {
     display: block;
     width: 100% !important;
     min-width: 0 !important;
@@ -303,5 +328,128 @@
     width: 100%;
     color: var(--error);
     background: rgba(239, 68, 68, 0.1);
+    min-height: 44px;
+    border-radius: 10px;
   }
+}
+
+@media (max-width: 480px) {
+  .simulator-container {
+    gap: 16px;
+  }
+
+  .sim-stat-value {
+    font-size: 28px;
+  }
+
+  .sim-delta {
+    font-size: 15px;
+    padding: 6px 12px;
+  }
+}
+
+.premium-sim-row {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-sim-row:hover {
+  transform: translateY(-2px) scale(1.01);
+  background: rgba(255, 255, 255, 0.03) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 8px 30px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(99, 102, 241, 0.05);
+}
+
+.premium-sim-row:focus-within {
+  background: rgba(255, 255, 255, 0.04) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 20px rgba(99, 102, 241, 0.08) !important;
+}
+
+.sim-grade-select-glow {
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  transition: all 0.2s ease;
+}
+
+.sim-bump-btn-glow {
+  transition: all 0.2s ease;
+}
+
+.sim-bump-btn-glow:hover:not(:disabled) {
+  transform: scale(1.15);
+}
+
+.sem-btn-add {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sem-btn-add:hover {
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.5), 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+}
+
+.sem-btn-add:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+.value-increase {
+  animation: gpa-pulse-green 0.6s ease-out;
+}
+
+.value-decrease {
+  animation: gpa-pulse-red 0.6s ease-out;
+}
+
+@keyframes gpa-pulse-green {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(16, 185, 129, 0));
+  }
+
+  50% {
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.6));
+  }
+
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(16, 185, 129, 0));
+  }
+}
+
+@keyframes gpa-pulse-red {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(239, 68, 68, 0));
+  }
+
+  50% {
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
+  }
+
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(239, 68, 68, 0));
+  }
+}
+
+/* Light mode overrides */
+[data-theme="light"] .premium-sim-row:hover {
+  background: #f8fafc !important;
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .premium-sim-row:focus-within {
+  background: #f1f5f9 !important;
+}
+
+[data-theme="light"] .sim-grade-select-glow {
+  box-shadow: 0 0 10px rgba(79, 70, 229, 0.08);
+  border-color: #4f46e5 !important;
+}
+
+[data-theme="light"] .sem-btn-add:hover {
+  box-shadow: 0 0 15px rgba(79, 70, 229, 0.3), 0 2px 8px rgba(79, 70, 229, 0.2) !important;
 }

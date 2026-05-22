@@ -11,6 +11,70 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [profileData, setProfileData] = useState({
+    name: '',
+    email: '',
+    profilePhoto: '',
+    branch: '',
+    year: '',
+    targetCGPA: '',
+    memberSince: ''
+  });
+
+  useEffect(() => {
+    if (currentUser) {
+      const storedProfile = localStorage.getItem(`profile_data_${currentUser}`);
+      const options = { month: 'long', year: 'numeric' };
+      const formattedDate = new Date().toLocaleDateString('en-US', options);
+
+      if (storedProfile) {
+        const parsed = JSON.parse(storedProfile);
+        const hasMemberSince = !!parsed.memberSince;
+        const finalMemberSince = parsed.memberSince || formattedDate;
+        
+        const updated = {
+          name: parsed.name || '',
+          email: parsed.email || '',
+          profilePhoto: parsed.profilePhoto || '',
+          branch: parsed.branch || '',
+          year: parsed.year || '',
+          targetCGPA: parsed.targetCGPA || '',
+          memberSince: finalMemberSince
+        };
+
+        if (!hasMemberSince) {
+          localStorage.setItem(`profile_data_${currentUser}`, JSON.stringify(updated));
+        }
+        setProfileData(updated);
+      } else {
+        const defName = currentUser === 'guest' ? 'Guest User' : currentUser;
+        const defEmail = currentUser === 'guest' ? 'guest@example.com' : `${currentUser}@gmail.com`;
+        const defaultProf = {
+          name: defName,
+          email: defEmail,
+          profilePhoto: '',
+          branch: '',
+          year: '',
+          targetCGPA: '',
+          memberSince: formattedDate
+        };
+        localStorage.setItem(`profile_data_${currentUser}`, JSON.stringify(defaultProf));
+        setProfileData(defaultProf);
+      }
+    } else {
+      setProfileData({ name: '', email: '', profilePhoto: '', branch: '', year: '', targetCGPA: '', memberSince: '' });
+    }
+  }, [currentUser]);
+
+  const updateProfileData = (newData) => {
+    if (currentUser) {
+      const updated = { ...profileData, ...newData };
+      localStorage.setItem(`profile_data_${currentUser}`, JSON.stringify(updated));
+      setProfileData(updated);
+      return { success: true };
+    }
+    return { success: false, error: 'No authenticated user' };
+  };
 
   const loadUserData = async (username) => {
     try {
@@ -156,7 +220,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, signup, logout, loginAsGuest, userData, saveUserData, isLoading }}>
+    <AuthContext.Provider value={{ currentUser, login, signup, logout, loginAsGuest, userData, saveUserData, isLoading, profileData, updateProfileData }}>
       {children}
     </AuthContext.Provider>
   );

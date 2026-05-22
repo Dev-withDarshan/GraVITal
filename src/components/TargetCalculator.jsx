@@ -44,6 +44,23 @@ export default function TargetCalculator({ initialData, onChange }) {
   const [targetCGPA, setTargetCGPA] = useState(initialData?.targetCGPA || '');
   const [nextSemCredits, setNextSemCredits] = useState(initialData?.nextSemCredits || '');
 
+  const handleCGPAChange = (e, setter) => {
+    let val = e.target.value;
+    if (val.includes('.') && val.split('.')[1].length > 2) return;
+    setter(val);
+  };
+
+  const getCGPAError = (val) => {
+    if (!val) return '';
+    const num = Number(val);
+    if (num < 0 || num > 10) return 'CGPA must be between 0 and 10';
+    return '';
+  };
+
+  const currentCGPAError = getCGPAError(currentCGPA);
+  const targetCGPAError = getCGPAError(targetCGPA);
+  const hasErrors = !!currentCGPAError || !!targetCGPAError;
+
   React.useEffect(() => {
     if (onChange) {
       onChange({
@@ -57,7 +74,7 @@ export default function TargetCalculator({ initialData, onChange }) {
   }, [currentCredits, currentCGPA, targetCGPA, nextSemCredits]);
 
   const calculateRequiredGPA = () => {
-    if (!currentCredits || !currentCGPA || !targetCGPA || !nextSemCredits) return null;
+    if (hasErrors || !currentCredits || !currentCGPA || !targetCGPA || !nextSemCredits) return null;
 
     const currCred = Number(currentCredits);
     const currCGPA = Number(currentCGPA);
@@ -124,7 +141,7 @@ export default function TargetCalculator({ initialData, onChange }) {
               />
               <div className="tc-ring-center">
                 <span className="tc-ring-label">TARGET NEXT SEM</span>
-                <span className={`tc-ring-value ${isImpossible ? 'tc-impossible' : hasResult ? 'smooth-gradient-text' : 'tc-empty'}`}>
+                <span className={`tc-ring-value ${isImpossible ? 'tc-impossible' : hasResult ? 'blue-glow-text' : 'tc-empty'}`}>
                   {hasResult ? requiredGPA : '--'}
                 </span>
                 <span className="tc-ring-sub">CGPA Required</span>
@@ -182,15 +199,14 @@ export default function TargetCalculator({ initialData, onChange }) {
                 <span className="tc-stat-value">{nextSemCredits || '—'}</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Insight Strip */}
-        <div className={`tc-insight ${isImpossible ? 'tc-insight-warn' : ''}`}>
-          <insight.icon size={20} className="tc-insight-icon" />
-          <div>
-            <span className="tc-insight-text">{insight.text}</span>
-            {insight.sub && <span className="tc-insight-sub">{insight.sub}</span>}
+            {/* Insight Strip moved to grid */}
+            <div className={`tc-insight ${isImpossible ? 'tc-insight-warn' : ''}`}>
+              <insight.icon size={20} className="tc-insight-icon" />
+              <div>
+                <span className="tc-insight-text">{insight.text}</span>
+                {insight.sub && <span className="tc-insight-sub">{insight.sub}</span>}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -225,16 +241,22 @@ export default function TargetCalculator({ initialData, onChange }) {
             <div className="tc-input-wrap">
               <input
                 type="number"
-                className="input-field"
-                placeholder="e.g. 7.5"
+                className={`input-field ${currentCGPAError ? 'input-error' : ''}`}
+                placeholder="Enter CGPA (0 - 10)"
                 step="0.01"
                 min="0"
                 max="10"
                 value={currentCGPA}
-                onChange={(e) => setCurrentCGPA(e.target.value)}
+                onChange={(e) => handleCGPAChange(e, setCurrentCGPA)}
+                style={currentCGPAError ? { borderColor: '#ef4444' } : {}}
               />
               <span className="tc-input-suffix">CGPA</span>
             </div>
+            {currentCGPAError ? (
+              <span style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px', display: 'block' }}>{currentCGPAError}</span>
+            ) : (
+              <span style={{ color: '#9ca3af', fontSize: '11px', marginTop: '4px', display: 'block' }}>Valid range: 0.00 to 10.00</span>
+            )}
           </div>
 
           <div className="tc-field">
@@ -242,16 +264,22 @@ export default function TargetCalculator({ initialData, onChange }) {
             <div className="tc-input-wrap">
               <input
                 type="number"
-                className="input-field"
-                placeholder="e.g. 8.0"
+                className={`input-field ${targetCGPAError ? 'input-error' : ''}`}
+                placeholder="Enter CGPA (0 - 10)"
                 step="0.01"
                 min="0"
                 max="10"
                 value={targetCGPA}
-                onChange={(e) => setTargetCGPA(e.target.value)}
+                onChange={(e) => handleCGPAChange(e, setTargetCGPA)}
+                style={targetCGPAError ? { borderColor: '#ef4444' } : {}}
               />
               <span className="tc-input-suffix">CGPA</span>
             </div>
+            {targetCGPAError ? (
+              <span style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px', display: 'block' }}>{targetCGPAError}</span>
+            ) : (
+              <span style={{ color: '#9ca3af', fontSize: '11px', marginTop: '4px', display: 'block' }}>Valid range: 0.00 to 10.00</span>
+            )}
           </div>
 
           <div className="tc-field">

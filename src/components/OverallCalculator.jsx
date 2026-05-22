@@ -5,44 +5,17 @@ import './OverallCalculator.css';
 import AnimatedNumber from './AnimatedNumber';
 import { parseVtopText } from './SemesterCalculator';
 import { MagneticButton } from './Spotlight';
-
-
-// Grade mapping constants
-const GRADE_MAP = { S: 10, A: 9, B: 8, C: 7, D: 6, F: 0 };
-const GRADE_OPTIONS = Object.keys(GRADE_MAP);
-
-// Helper: compute GPA from subjects safely
-function computeDetailedGPA(subjects = []) {
-  if (!subjects || !Array.isArray(subjects) || subjects.length === 0) return 0;
-  let totalCredits = 0;
-  let totalPoints = 0;
-  for (const sub of subjects) {
-    const c = Number(sub.credits) || 0;
-    const g = GRADE_MAP[sub.grade];
-    if (c > 0 && g !== undefined) {
-      totalCredits += c;
-      totalPoints += c * g;
-    }
-  }
-  return totalCredits === 0 ? 0 : totalPoints / totalCredits;
-}
-
-// Helper: get effective GPA for a semester
-function getSemesterGPA(sem) {
-  if (sem.mode === 'detailed') {
-    return computeDetailedGPA(sem.subjects);
-  }
-  return Number(sem.manualGPA) || 0;
-}
-
-// Helper: get effective credits for a semester
-function getSemesterCredits(sem) {
-  if (sem.mode === 'detailed') {
-    if (!sem.subjects || !Array.isArray(sem.subjects) || sem.subjects.length === 0) return 0;
-    return sem.subjects.reduce((sum, s) => sum + (Number(s.credits) || 0), 0);
-  }
-  return Number(sem.totalCredits) || 0;
-}
+import {
+  GRADE_MAP,
+  GRADE_OPTIONS,
+  getSemesterGPA,
+  getSemesterCredits
+} from '../utils/analytics';
+import CGPACard from './CGPACard';
+import CreditsCard from './CreditsCard';
+import TrendCard from './TrendCard';
+import ActionBar from './ActionBar';
+import AnalyzeModal from './AnalyzeModal';
 
 // Helper: create a blank subject
 function createSubject(index = '') {
@@ -101,6 +74,16 @@ function SemesterCard({ sem, index, semesters, onUpdate, onRemove, expanded, onT
     if (newMode === sem.mode) return;
     onUpdate(sem.id, { mode: newMode }); // ONLY toggles mode, ZERO data destruction
   }, [sem, onUpdate]);
+
+  const handleCGPAChange = (e) => {
+    let val = e.target.value;
+    if (val.includes('.') && val.split('.')[1].length > 2) return;
+    onUpdate(sem.id, { manualGPA: val });
+  };
+
+  const gpaError = sem.manualGPA !== '' && (Number(sem.manualGPA) < 0 || Number(sem.manualGPA) > 10) 
+    ? 'CGPA must be between 0 and 10' 
+    : '';
 
   const [isAutofillModalOpen, setIsAutofillModalOpen] = useState(false);
   const [vtopText, setVtopText] = useState("");
@@ -220,7 +203,7 @@ function SemesterCard({ sem, index, semesters, onUpdate, onRemove, expanded, onT
         <div className="sem-header-right">
           <div className="sem-stat-compact">
             <span className="sem-stat-compact-label">GPA</span>
-            <span className="sem-stat-compact-val smooth-gradient-text">{effectiveGPA.toFixed(2)}</span>
+            <span className="sem-stat-compact-val blue-glow-text">{effectiveGPA.toFixed(2)}</span>
           </div>
           <div className="sem-stat-compact">
             <span className="sem-stat-compact-label">CREDITS</span>
@@ -283,13 +266,20 @@ function SemesterCard({ sem, index, semesters, onUpdate, onRemove, expanded, onT
                   <label>GPA Achieved</label>
                   <input
                     type="number"
-                    className="input-field"
+                    className={`input-field ${gpaError ? 'input-error' : ''}`}
                     min="0"
                     max="10"
                     step="0.01"
                     value={sem.manualGPA}
-                    onChange={(e) => onUpdate(sem.id, { manualGPA: e.target.value })}
+                    onChange={handleCGPAChange}
+                    style={gpaError ? { borderColor: '#ef4444' } : {}}
+                    placeholder="Enter CGPA (0 - 10)"
                   />
+                  {gpaError ? (
+                    <span style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px', display: 'block' }}>{gpaError}</span>
+                  ) : (
+                    <span style={{ color: '#9ca3af', fontSize: '11px', marginTop: '4px', display: 'block' }}>Valid range: 0.00 to 10.00</span>
+                  )}
                 </div>
               </div>
 
@@ -454,6 +444,7 @@ export default function OverallCalculator({ initialData, onChange }) {
 
   const [isCompact, setIsCompact] = useState(false);
   const [expandedCardId, setExpandedCardId] = useState(null);
+  const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -468,7 +459,7 @@ export default function OverallCalculator({ initialData, onChange }) {
   }, []);
 
   // --- Compute overall CGPA ---
-  const { cgpa: currentOverallCgpa, totalCredits: overallCredits } = useMemo(() => {
+  const currentOverallCgpa = useMemo(() => {
     let totalCredits = 0;
     let totalWeightedPoints = 0;
 
@@ -477,15 +468,24 @@ export default function OverallCalculator({ initialData, onChange }) {
         if (sem.isIncluded === false) return;
         const credits = getSemesterCredits(sem);
         const gpa = getSemesterGPA(sem);
-        if (credits > 0 && gpa >= 0) {
+        if (credits > 0 && gpa >= 0 && gpa <= 10) {
           totalCredits += credits;
           totalWeightedPoints += credits * gpa;
         }
       });
     }
 
-    const cgpa = totalCredits === 0 ? "0.0000" : (totalWeightedPoints / totalCredits).toFixed(4);
-    return { cgpa, totalCredits };
+    return totalCredits === 0 ? "0.0000" : (totalWeightedPoints / totalCredits).toFixed(4);
+  }, [semesters]);
+
+  const overallCredits = useMemo(() => {
+    if (!Array.isArray(semesters)) return 0;
+    return semesters.reduce((sum, sem) => {
+      if (sem.isIncluded === false) return sum;
+      const gpa = getSemesterGPA(sem);
+      if (gpa < 0 || gpa > 10) return sum;
+      return sum + getSemesterCredits(sem);
+    }, 0);
   }, [semesters]);
 
   // --- Propagate changes to parent ---
@@ -512,115 +512,24 @@ export default function OverallCalculator({ initialData, onChange }) {
     setSemesters(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
   }, []);
 
-  const performanceBadge = useMemo(() => {
-    const cgpa = parseFloat(currentOverallCgpa);
-    if (cgpa >= 9.0) return { text: "Excellent Performance! 🔥", class: "badge-excellent" };
-    if (cgpa >= 8.0) return { text: "Good Performance! ✨", class: "badge-good" };
-    if (cgpa >= 7.0) return { text: "Average Performance 👍", class: "badge-average" };
-    return { text: "Needs Improvement 🚀", class: "badge-needs-improvement" };
-  }, [currentOverallCgpa]);
-
-  const targetPercentage = useMemo(() => {
-    const cgpa = parseFloat(currentOverallCgpa);
-    return Math.min((cgpa / 10) * 100, 100).toFixed(0);
-  }, [currentOverallCgpa]);
-
   return (
     <div className="calculator-container saas-dashboard">
       {/* ── TOP SECTION (GRID) ── */}
-      <div className="dashboard-top-grid animate-fade-in stagger-1">
-
-        {/* 1. HERO CARD */}
-        <div className="hero-card glass-panel">
-          <div className="hero-content">
-            <h3 className="hero-subtitle">Overall Cumulative CGPA</h3>
-            <AnimatedNumber value={currentOverallCgpa} decimals={4} className="hero-cgpa-value smooth-gradient-text" />
-
-            <div className={`performance-badge ${performanceBadge.class}`}>
-              {performanceBadge.text}
-            </div>
-
-            <p className="hero-insight">
-              You're in the <span className="highlight-text">top 10%</span> of students
-            </p>
-
-            <div className="progress-container">
-              <div className="progress-bar-wrapper">
-                <div className="progress-bar-fill" style={{ width: `${targetPercentage}%` }}></div>
-              </div>
-              <div className="progress-labels">
-                <span>{targetPercentage}% towards perfect CGPA</span>
-                <span>Target: 10.0000</span>
-              </div>
-            </div>
-          </div>
-          <div className="hero-graphic">
-            <div className="hero-graphic-circle">
-              <Hexagon size={48} className="hero-graphic-icon" />
-              <Star size={20} className="hero-graphic-star" fill="currentColor" />
-            </div>
-          </div>
-        </div>
-
-        {/* 2 & 3. STATS CARDS */}
-        <div className="stats-cards-col">
-          {/* CREDITS CARD */}
-          <div className="stat-card glass-panel">
-            <div className="stat-card-header">
-              <div className="stat-icon-wrapper"><GraduationCap size={20} /></div>
-              <span className="stat-card-title">TOTAL CREDITS</span>
-            </div>
-            <div className="stat-card-value">{overallCredits}</div>
-            <div className="stat-card-desc">Credits Completed</div>
-          </div>
-
-          {/* TREND CARD */}
-          <div className="stat-card glass-panel">
-            <div className="stat-card-header">
-              <div className="stat-icon-wrapper trend-icon"><TrendingUp size={20} /></div>
-              <span className="stat-card-title">CGPA TREND</span>
-            </div>
-            <div className="trend-graphic">
-              <svg width="100%" height="40" viewBox="0 0 200 40" preserveAspectRatio="none">
-                <path d="M0,20 L30,25 L60,15 L90,20 L120,5 L150,15 L200,0" fill="none" stroke="url(#trendGradient)" strokeWidth="3" vectorEffect="non-scaling-stroke" />
-                <circle cx="0" cy="20" r="4" fill="#8b5cf6" />
-                <circle cx="30" cy="25" r="4" fill="#8b5cf6" />
-                <circle cx="60" cy="15" r="4" fill="#8b5cf6" />
-                <circle cx="90" cy="20" r="4" fill="#8b5cf6" />
-                <circle cx="120" cy="5" r="4" fill="#8b5cf6" />
-                <circle cx="150" cy="15" r="4" fill="#06b6d4" />
-                <circle cx="200" cy="0" r="4" fill="#06b6d4" />
-                <defs>
-                  <linearGradient id="trendGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#8b5cf6" />
-                    <stop offset="100%" stopColor="#06b6d4" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <div className="trend-footer">
-              <span className="trend-badge">Stable</span>
-              <span className="stat-card-desc">Consistent Performance</span>
-            </div>
-          </div>
+      <div className="top-grid animate-fade-in stagger-1">
+        <CGPACard cgpa={currentOverallCgpa} semesters={semesters} />
+        <div className="right-column">
+          <CreditsCard credits={overallCredits} />
+          <TrendCard semesters={semesters} onAddSemester={addSemester} />
         </div>
       </div>
 
       {/* ── ACTION BAR ── */}
-      <div className="dashboard-action-bar animate-fade-in stagger-2">
-        <span className="action-bar-label">What would you like to do?</span>
-        <div className="action-buttons">
-          <button className="btn-primary action-btn" onClick={addSemester}>
-            <Plus size={16} /> Add Semester
-          </button>
-          <button className="btn-secondary glass-btn action-btn">
-            <Zap size={16} /> Auto-Fill Typical
-          </button>
-          <button className="btn-secondary glass-btn action-btn">
-            <BarChart2 size={16} /> Analyze Performance
-          </button>
-        </div>
-      </div>
+      <ActionBar
+        semesters={semesters}
+        onAddSemester={addSemester}
+        onSetSemesters={setSemesters}
+        onOpenAnalysis={() => setIsAnalysisOpen(true)}
+      />
 
       {/* ── SEMESTER CARDS ── */}
       <div className="semester-cards-grid animate-fade-in stagger-3">
@@ -643,6 +552,14 @@ export default function OverallCalculator({ initialData, onChange }) {
           </div>
         )}
       </div>
+
+      {/* ── ANALYSIS MODAL ── */}
+      {isAnalysisOpen && (
+        <AnalyzeModal
+          semesters={semesters}
+          onClose={() => setIsAnalysisOpen(false)}
+        />
+      )}
     </div>
   );
 }

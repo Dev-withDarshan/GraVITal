@@ -85,7 +85,7 @@ export default function Dashboard() {
       {/* ── Centered Main Content ── */}
       <main className="dashboard-main">
         <div className="dashboard-content-wrapper">
-          <div className="tab-content animate-fade-in" key={activeTab}>
+          <div className="tab-content animate-mac-micromotion" key={activeTab}>
             {activeTab === 'semester' && (
               <SemesterCalculator
                 key={userData ? 'loaded' : 'default'}

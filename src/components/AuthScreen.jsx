@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Hexagon, LogIn, UserPlus, User, Eye, EyeOff } from 'lucide-react';
+import { LogIn, UserPlus, User, Eye, EyeOff } from 'lucide-react';
 import './AuthScreen.css';
 
 export default function AuthScreen() {
@@ -11,21 +11,21 @@ export default function AuthScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const { login, signup, loginAsGuest } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (!username.trim() || !password) {
       setError('Please enter both username and password');
       return;
     }
 
     const normalizedUsername = username.trim().toLowerCase();
-    
+
     if (isLogin) {
       setLoading(true);
       try {
@@ -53,19 +53,30 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="auth-container animate-fade-in">
+    <div className="auth-container animate-fade-scale-in">
+      <div className="auth-bg-layer">
+        <div className="auth-bg-waves"></div>
+        <div className="auth-bg-glows"></div>
+      </div>
       <div className="glass-panel auth-card">
         <div className="auth-header">
-          <div className="icon-wrapper">
-            <Hexagon size={40} className="text-accent" />
+          <div className="auth-brand-wrapper">
+            <div className="auth-brand-glow" />
+            <img 
+              src="/Logo.png"
+              alt="GraVITal Logo"
+              className="auth-brand-logo"
+            />
+            <h1 className="auth-brand-title">
+              Gra<span className="smooth-gradient-text">VIT</span>al
+            </h1>
           </div>
-          <h1>Score<span className="smooth-gradient-text">Loom</span></h1>
           <p className="subtitle">{isLogin ? 'Welcome back! Log in to continue.' : 'Create an account to start tracking.'}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
           {error && <div className="error-message">{error}</div>}
-          
+
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <input
@@ -90,8 +101,8 @@ export default function AuthScreen() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="pwd-toggle-btn"
                 onClick={() => setShowPassword(!showPassword)}
               >
@@ -101,8 +112,8 @@ export default function AuthScreen() {
           </div>
 
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn-primary auth-submit"
             disabled={loading}
           >
@@ -115,8 +126,8 @@ export default function AuthScreen() {
           <span>or continue with</span>
         </div>
 
-        <button 
-          className="btn-secondary guest-btn" 
+        <button
+          className="btn-secondary guest-btn"
           onClick={handleGuestLogin}
           type="button"
         >
@@ -127,8 +138,8 @@ export default function AuthScreen() {
         <div className="auth-footer">
           <p>
             {isLogin ? "Don't have an account?" : "Already have an account?"}
-            <button 
-              className="toggle-mode-btn" 
+            <button
+              className="toggle-mode-btn"
               onClick={() => { setIsLogin(!isLogin); setError(''); }}
             >
               {isLogin ? 'Sign up' : 'Log in'}

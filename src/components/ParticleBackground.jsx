@@ -11,13 +11,13 @@ const DARK_PALETTE = [
   'rgba(196, 181, 253, 0.65)',
 ];
 
-// Darker, richer colors with higher contrast for light mode
+// Brighter, more visible colors with higher opacity for light mode
 const LIGHT_PALETTE = [
-  'rgba(49, 46, 129, 0.35)',
-  'rgba(15, 118, 110, 0.30)',
-  'rgba(153, 27, 27, 0.25)',
-  'rgba(67, 56, 202, 0.30)',
-  'rgba(30, 58, 138, 0.30)',
+  'rgba(99, 102, 241, 0.85)',  // Indigo
+  'rgba(139, 92, 246, 0.80)',  // Purple
+  'rgba(14, 165, 233, 0.75)',  // Light Blue/Cyan
+  'rgba(37, 99, 235, 0.80)',   // Blue
+  'rgba(147, 51, 234, 0.75)',  // Violet
 ];
 
 export default function ParticleBackground() {
@@ -37,12 +37,12 @@ export default function ParticleBackground() {
     const palette = theme === 'light' ? LIGHT_PALETTE : DARK_PALETTE;
 
     const mouse = { x: -9999, y: -9999 };
-    const REPEL_RADIUS = 130;
-    const REPEL_STRENGTH = 6;
+    const REPEL_RADIUS = 150;
+    const REPEL_STRENGTH = 3;
 
     function createParticle() {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 0.3 + Math.random() * 0.3;
+      const speed = 0.15 + Math.random() * 0.2;
       return {
         x: Math.random() * width,
         y: Math.random() * height,
@@ -90,8 +90,8 @@ export default function ParticleBackground() {
           const force = (REPEL_RADIUS - dist) / REPEL_RADIUS;
           const pushX = (dx / dist) * force * REPEL_STRENGTH;
           const pushY = (dy / dist) * force * REPEL_STRENGTH;
-          p.vx += (pushX - p.vx) * 0.08;
-          p.vy += (pushY - p.vy) * 0.08;
+          p.vx += (pushX - p.vx) * 0.06;
+          p.vy += (pushY - p.vy) * 0.06;
         } else {
           p.vx += (p.baseVx - p.vx) * 0.02;
           p.vy += (p.baseVy - p.vy) * 0.02;
@@ -132,6 +132,7 @@ export default function ParticleBackground() {
   return (
     <canvas
       ref={canvasRef}
+      className={theme === 'light' ? 'light-mode-particles' : ''}
       style={{
         position: 'fixed',
         top: 0,

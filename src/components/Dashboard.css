@@ -24,7 +24,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 16px 24px 40px;
+  padding: 8px 16px 24px; /* Reduced to pull content up */
   width: 100%;
 }
 
@@ -40,7 +40,15 @@
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
   .dashboard-main {
-    padding: 16px 16px 40px;
+    padding: 12px 12px 32px;
   }
+}
 
+@media (max-width: 480px) {
+  .dashboard-main {
+    padding: 8px 8px 24px;
+  }
+  .dashboard-content-wrapper {
+    overflow-x: hidden;
+  }
 }

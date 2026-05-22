@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ArrowRight, Cloud, Shield, Calculator, LayoutDashboard, BarChart3, Sparkles, Camera } from 'lucide-react';
+import { ArrowRight, Cloud, Shield, Calculator, LayoutDashboard, BarChart3, Sparkles, Camera, GraduationCap, Gift, ChevronsRight, Rocket } from 'lucide-react';
 import './LandingPage.css';
 import { SpotlightCard, MagneticButton } from './Spotlight';
 
@@ -39,16 +39,24 @@ const InteractiveText = ({ children, as: Component = 'div', className = '' }) =>
   );
 };
 
+const getGreeting = () => {
+  const hour = new Date().getHours();
+
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+};
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { currentUser, profileData } = useAuth();
 
   // Treat guests as logged out for the sake of the landing page UI
   const isRealUser = currentUser && currentUser !== 'guest';
 
   // Capitalize user's name dynamically (e.g., "darshan" -> "Darshan")
-  const formattedName = currentUser
-    ? currentUser.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+  const displayName = profileData?.name?.trim() || currentUser || '';
+  const formattedName = displayName
+    ? displayName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
     : '';
 
   return (
@@ -57,43 +65,119 @@ export default function LandingPage() {
 
         {/* Hero Section */}
         <header className="hero-section">
-          <div className="hero-badge">Cloud-Powered Academic Engine 🚀</div>
-          <InteractiveText className="hero-text-block">
-            <h1 className="hero-title">
-              {isRealUser ? (
-                <>Welcome back, <br /><span className="smooth-gradient-text">{formattedName}</span>👋</>
-              ) : (
-                <>Weave Your <br /><span className="smooth-gradient-text">Academic Future</span></>
-              )}
-            </h1>
-            <p className="hero-subtitle">
-              {isRealUser
-                ? "Let’s continue building your academic edge."
-                : "Calculate semester GPA, track cumulative CGPA, plan target scores, and simulate grade changes — all in one modern dashboard."
-              }
-            </p>
-          </InteractiveText>
+          <div className="hero-grid-overlay" />
+          <div className="hero-glow-arc" />
+          <div className="hero-glow-radial-light" />
+          <div className="hero-glow-line" />
 
+          {/* Top Badge */}
+          <div className="hero-badge-premium">
+            <span>⚡ Grade Intelligence for VIT</span>
+          </div>
+
+          {isRealUser ? (
+            <InteractiveText className="hero-text-block">
+              <h1 className="hero-title-premium">
+                <span className="shining-silver-text">{getGreeting()},</span> <br />
+                <span className="blue-glow-text">{formattedName}</span> <span className="native-emoji">👋</span>
+              </h1>
+              <p className="hero-description-premium">
+                Let’s continue building your <span className="highlight-edge">academic edge</span>,
+                Powered by <span className="highlight-edge">Gravital</span> — Grade VIT For All❗
+              </p>
+            </InteractiveText>
+          ) : (
+            <>
+              {/* Title */}
+              <h1 className="hero-title-premium">
+                Gra<span className="smooth-gradient-text">VIT</span>al
+              </h1>
+
+              {/* Sub Headline */}
+              <h2 className="hero-subheadline">
+                Because every <span className="gradient-001">0.01</span> is vital.
+              </h2>
+
+              {/* Supporting Text */}
+              <p className="hero-description">
+                Calculate, simulate, and optimize your GPA — instantly.
+              </p>
+            </>
+          )}
+
+          {/* CTA Actions */}
           <div className="hero-actions">
             {isRealUser ? (
-              <MagneticButton
-                className="btn-primary hero-btn"
+              <button
+                className="btn-premium-dashboard"
                 onClick={() => navigate('/dashboard')}
-                strength={0.35}
-                maxShift={12}
               >
-                Go to Dashboard <LayoutDashboard size={18} style={{ marginLeft: '8px' }} />
-              </MagneticButton>
+                <div className="btn-icon-left">
+                  <BarChart3 size={20} />
+                </div>
+                <div className="btn-content-center">
+                  <span className="btn-title">Go to Dashboard</span>
+                  <span className="btn-subtitle">TRACK. ANALYZE. EXCEL.</span>
+                </div>
+                <div className="btn-icon-right">
+                  <ChevronsRight size={24} />
+                </div>
+              </button>
             ) : (
-              <MagneticButton
-                className="btn-primary hero-btn"
-                onClick={() => navigate('/login')}
-                strength={0.35}
-                maxShift={12}
-              >
-                Get Started Free <ArrowRight size={18} style={{ marginLeft: '8px' }} />
-              </MagneticButton>
+              <div className="neon-cta-wrapper">
+                <button
+                  className="btn-neon-get-started"
+                  onClick={() => navigate('/login')}
+                >
+                  <div className="neon-btn-icon neon-icon-left">
+                    <Rocket size={22} strokeWidth={2.5} />
+                  </div>
+                  <span className="neon-btn-text">Get Started</span>
+                  <div className="neon-btn-icon neon-icon-right">
+                    <ArrowRight size={22} strokeWidth={2.5} />
+                  </div>
+                </button>
+                <div className="neon-cta-subtitle">
+                  <span className="neon-dot neon-dot-left"></span>
+                  Start tracking your academic performance instantly
+                  <span className="neon-dot neon-dot-right"></span>
+                </div>
+                <div className="neon-floor-glow"></div>
+              </div>
             )}
+          </div>
+
+          {/* Lower Feature Bar */}
+          <div className="hero-feature-bar">
+            <div className="feature-bar-item">
+              <div className="item-icon-wrapper">
+                <GraduationCap size={20} />
+              </div>
+              <div className="item-text">
+                <span className="item-title">SGPA</span>
+                <span className="item-desc">Per Semester</span>
+              </div>
+            </div>
+            <div className="feature-bar-divider" />
+            <div className="feature-bar-item">
+              <div className="item-icon-wrapper">
+                <BarChart3 size={20} />
+              </div>
+              <div className="item-text">
+                <span className="item-title">CGPA</span>
+                <span className="item-desc">Cumulative</span>
+              </div>
+            </div>
+            <div className="feature-bar-divider" />
+            <div className="feature-bar-item">
+              <div className="item-icon-wrapper">
+                <Gift size={20} />
+              </div>
+              <div className="item-text">
+                <span className="item-title">100% Free</span>
+                <span className="item-desc">Always</span>
+              </div>
+            </div>
           </div>
         </header>
 
@@ -107,7 +191,7 @@ export default function LandingPage() {
 
           <SpotlightCard className="glass-panel feature-card">
             <div className="feature-icon"><BarChart3 size={32} /></div>
-            <h3>ScoreLoom Insights</h3>
+            <h3>GraVITal Insights</h3>
             <p>Track your academic trajectory over time. Our dynamic dashboard visualizes your semester-over-semester progress.</p>
           </SpotlightCard>
 
