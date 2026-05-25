@@ -11,19 +11,20 @@ router.get("/test", (req, res) => {
 // Register Route
 const registerHandler = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const username = req.body.username.trim();
+    const { password } = req.body;
 
-    console.log(`Register request received for: ${username ? username.toLowerCase() : 'unknown'}`);
+    console.log(`Register request received for: ${username ? username : 'unknown'}`);
 
     const existingUser = await User.findOne({ 
-      username: username.toLowerCase() 
+      username: username 
     });
     if (existingUser) {
       return res.status(400).json({ error: "User already exists. Please choose a different username." });
     }
 
     const user = new User({ 
-      username: username.toLowerCase(), 
+      username: username, 
       password 
     });
 
@@ -51,11 +52,12 @@ router.post('/signup', registerHandler);
 
 // Login Route
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  const { password } = req.body;
+  const username = req.body.username?.trim();
   if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
 
   try {
-    const user = await User.findOne({ username: username.toLowerCase() });
+    const user = await User.findOne({ username: username });
     if (!user) return res.status(404).json({ error: 'User not found. Please sign up.' });
 
     const isMatch = await user.comparePassword(password);

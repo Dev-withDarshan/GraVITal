@@ -24,7 +24,7 @@ export default function AuthScreen() {
       return;
     }
 
-    const normalizedUsername = username.trim().toLowerCase();
+    const normalizedUsername = username.trim();
 
     if (isLogin) {
       setLoading(true);

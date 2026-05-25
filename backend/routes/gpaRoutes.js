@@ -9,7 +9,7 @@ router.post("/save-gpa", async (req, res) => {
     const { username, gpaData } = req.body;
 
     const result = await User.updateOne(
-      { username: username.toLowerCase() },
+      { username: username},
       { $set: { gpaData } }
     );
     if (result.matchedCount === 0) {
@@ -27,7 +27,7 @@ router.post("/save-gpa", async (req, res) => {
 const loadGpaHandler = async (req, res) => {
   try {
     const user = await User.findOne(
-      { username: req.params.username.toLowerCase() },
+      { username: req.params.username},
       { gpaData: 1 }
     );
     if (!user) return res.status(404).json({ error: 'User not found.' });

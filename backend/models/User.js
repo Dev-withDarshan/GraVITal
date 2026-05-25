@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+// ✅ Schema defined FIRST
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
     unique: true,
-    trim: true,
-    lowercase: true
+    trim: true
   },
   password: {
     type: String,
@@ -19,15 +19,18 @@ const UserSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// ✅ SAFE VERSION (NO next() needed)
+// ✅ Index defined AFTER the schema
+UserSchema.index(
+  { username: 1 },
+  { unique: true}
+);
+
 UserSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
-
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare password
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
