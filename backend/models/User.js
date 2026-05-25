@@ -5,7 +5,7 @@ const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true,   // ✅ keep this
+    unique: true,
     trim: true
   },
   password: {
@@ -16,7 +16,10 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     default: null
   }
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  collation: { locale: 'en', strength: 3 } // ✅ CASE-SENSITIVE & ACCENT-SENSITIVE COLLATION
+});
 
 
 UserSchema.pre("save", async function () {
