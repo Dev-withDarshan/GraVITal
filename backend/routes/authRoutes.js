@@ -18,7 +18,8 @@ const registerHandler = async (req, res) => {
 
     const existingUser = await User.findOne({ 
       username: username 
-    });
+    }).collation({ locale: 'en', strength: 2 }); // ✅ Case-sensitive collation
+    
     if (existingUser) {
       return res.status(400).json({ error: "User already exists. Please choose a different username." });
     }
@@ -57,7 +58,7 @@ router.post('/login', async (req, res) => {
   if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
 
   try {
-    const user = await User.findOne({ username: username });
+    const user = await User.findOne({ username: username }).collation({ locale: 'en', strength: 2 }); // ✅ Case-sensitive collation
     if (!user) return res.status(404).json({ error: 'User not found. Please sign up.' });
 
     const isMatch = await user.comparePassword(password);
