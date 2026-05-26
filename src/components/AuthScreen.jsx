@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, UserPlus, User, Eye, EyeOff } from 'lucide-react';
 import './AuthScreen.css';
 
+
 export default function AuthScreen() {
+  useEffect(() => {
+    if (window.location.pathname === "/login") {
+      localStorage.removeItem("user");
+    }
+  }, []);
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -25,6 +32,7 @@ export default function AuthScreen() {
     }
 
     const normalizedUsername = username.trim();
+    const normalizedEmail = email.trim();
 
     if (isLogin) {
       setLoading(true);
@@ -41,7 +49,11 @@ export default function AuthScreen() {
         setLoading(false);
       }
     } else {
-      const res = await signup(normalizedUsername, password);
+      if (!normalizedEmail || !normalizedEmail.endsWith('@vitstudent.ac.in')) {
+        setError('A valid VIT email is required');
+        return;
+      }
+      const res = await signup(normalizedUsername, normalizedEmail, password);
       if (!res.success) setError(res.error);
       else navigate('/dashboard');
     }
@@ -62,7 +74,7 @@ export default function AuthScreen() {
         <div className="auth-header">
           <div className="auth-brand-wrapper">
             <div className="auth-brand-glow" />
-            <img 
+            <img
               src="/Logo.png"
               alt="GraVITal Logo"
               className="auth-brand-logo"
@@ -83,12 +95,28 @@ export default function AuthScreen() {
               type="text"
               id="username"
               className="input-field"
-              placeholder="e.g. darshan"
+              placeholder="e.g. Darshan"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="off"
             />
           </div>
+
+          {!isLogin && (
+            <div className="form-group animate-slide-in">
+              <label htmlFor="email">VIT Email <span className="text-accent">*</span></label>
+              <input
+                type="email"
+                id="email"
+                className="input-field"
+                placeholder="e.g. darshan.k2024@vitstudent.ac.in"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+              />
+              <span className="input-help-text" style={{ fontSize: '12.5px', color: 'var(--text-accent)', marginTop: '2px', opacity: 0.9 }}>Use your VIT email</span>
+            </div>
+          )}
 
           <div className="form-group">
             <label htmlFor="password">Password</label>

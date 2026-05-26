@@ -7,7 +7,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const API = "https://cgpa-grade-calculator-backend.onrender.com";
-  
+
   const [currentUser, setCurrentUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
         const parsed = JSON.parse(storedProfile);
         const hasMemberSince = !!parsed.memberSince;
         const finalMemberSince = parsed.memberSince || formattedDate;
-        
+
         const updated = {
           name: parsed.name || '',
           email: parsed.email || '',
@@ -129,13 +129,15 @@ export const AuthProvider = ({ children }) => {
   // 🚀 STEP 2: CONNECT LOGIN
   const login = async (username, password) => {
     try {
+      localStorage.removeItem("user");
+      setCurrentUser(null);
       const res = await fetch(`${API}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
       const data = await res.json();
-      
+
       if (data.success) {
         localStorage.setItem("user", username); // 🔥 store session
         setCurrentUser(username);
@@ -151,22 +153,22 @@ export const AuthProvider = ({ children }) => {
         toast.error(data.error);
         return { success: false, error: data.error };
       }
-    } catch(err) {
+    } catch (err) {
       toast.error("Cannot connect to server.");
       return { success: false, error: 'Cannot connect to server.' };
     }
   };
 
   // 🚀 STEP 1: CONNECT SIGNUP
-  const signup = async (username, password) => {
+  const signup = async (username, email, password) => {
     try {
       const res = await fetch(`${API}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, email, password })
       });
       const data = await res.json();
-      
+
       if (data.success) {
         localStorage.setItem("user", username);
         setCurrentUser(username);
@@ -176,7 +178,7 @@ export const AuthProvider = ({ children }) => {
         toast.error(data.error);
         return { success: false, error: data.error };
       }
-    } catch(err) {
+    } catch (err) {
       toast.error("Cannot connect to server.");
       return { success: false, error: 'Cannot connect to server.' };
     }

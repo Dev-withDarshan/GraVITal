@@ -1,77 +1,48 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" />
-  <img src="https://img.shields.io/badge/Vite-8-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
-  <img src="https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
-  <img src="https://img.shields.io/badge/MongoDB-In--Memory-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
-</p>
+# **GraVITal** 
+> The Ultimate Academic Tracking & Simulation Platform for VIT Students.
 
-<h1 align="center">⬡ GraVITal</h1>
-<p align="center"><em>Weave Your Academic Future</em></p>
+[![React](https://img.shields.io/badge/React-18.2.0-blue.svg?style=flat&logo=react)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-Backend-green.svg?style=flat&logo=nodedotjs)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Database-47A248.svg?style=flat&logo=mongodb)](https://www.mongodb.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<p align="center">
-  A premium, full-stack GPA calculator and academic performance tracker with a modern glassmorphic UI, real-time cloud sync, and intelligent grade simulation.
-</p>
+---
+
+## 📖 Why this project exists
+
+Tracking academic progress should be intuitive, precise, and visually engaging. GraVITal was built to solve the frustration of manually calculating CGPAs, estimating required grades for targets, and exploring "what-if" scenarios. We engineered a seamless, SaaS-grade platform specifically tailored for VIT students, bringing predictability and clarity to their academic journey.
+
+## 🚀 Key Highlights
+
+- **SaaS-Grade Aesthetics:** Modern glassmorphism UI, fluid micro-interactions, and a distraction-free environment.
+- **Predictive Intelligence:** Instantly simulate how different grades will impact your final CGPA.
+- **Enterprise-Level Security:** Robust JWT-based session handling with exclusive domain-level access (`@vitstudent.ac.in`).
 
 ---
 
 ## ✨ Features
 
-### 🎓 Semester GPA Calculator
-- **Subject-wise entry** with name, credits, and grade selection (VIT grading: S/A/B/C/D/F)
-- Separate **Theory** and **Lab** subject sections with collapsible panels
-- **Real-time GPA computation** — updates instantly as you type
-- **OCR-powered auto-fill** — upload a screenshot of your grades and let AI parse it
-- Quality badge & progress bar visualization
-
-### 📊 Overall CGPA Tracker
-- **Dual-mode semester entry** — Quick (manual GPA + credits) or Detailed (subject-by-subject)
-- Accordion-style semester cards with smooth expand/collapse transitions
-- **Include/Exclude toggle** per semester for what-if analysis
-- Sticky, compact CGPA header that adapts on scroll
-
-### 🎯 Target Calculator
-- Set your **desired CGPA** and see the exact GPA you need next semester
-- Animated progress ring with real-time feasibility analysis
-- Status badges: ✅ Achievable / ❌ Impossible
-- Smart insights and contextual tips
-
-### 🌗 Dark & Light Mode
-- Professional **theme toggle** in the global navbar (Sun/Moon icons)
-- Full design-system-level theming with CSS custom properties
-- Theme preference persisted via `localStorage`
-
-### 🫧 Interactive Particle Background
-- Subtle, animated canvas particle effect on the **Landing** and **Login** pages
-- **Mouse repulsion** — particles smoothly push away from the cursor
-- Theme-aware palettes (bright pastels for dark mode, rich tones for light mode)
-- Zero external libraries — pure vanilla JS with `requestAnimationFrame`
-
-### ☁️ Cloud Sync
-- **User authentication** (register / login / guest mode)
-- Semester data saved to MongoDB and synced across devices
-- Auto-save with visual feedback
-
-### 🎨 Premium UI/UX
-- Glassmorphic card design with `backdrop-filter` blur
-- Smooth gradient text animations (Indigo → Cyan)
-- Magnetic hover buttons and 3D tilt card effects via `Spotlight.jsx`
-- Animated number transitions on GPA values (count-up with easing)
-- Staggered fade-in entrance animations
-- Fully responsive — works on desktop, tablet, and mobile
+- **Exclusive Access:** Strict `@vitstudent.ac.in` email restriction ensures a localized, secure community.
+- **Real-time CGPA Simulator:** Explore "what-if" scenarios and adjust expected grades to see the immediate impact on your CGPA.
+- **Target Calculator:** Input your desired CGPA and let the system calculate the exact credits and grades required to achieve it.
+- **Semester Breakdown:** Granular tracking of individual semester performance.
+- **Responsive & Minimalist UI:** Built with performance and aesthetics in mind—perfectly scaling from ultra-wide monitors to mobile devices.
+- **Cloud Sync:** Securely save your GPA data to your profile and access it anywhere.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠 Tech Stack
 
-| Layer       | Technology                                   |
-|-------------|----------------------------------------------|
-| **Frontend**| React 19, Vite 8, React Router 7             |
-| **Styling** | Vanilla CSS with CSS Custom Properties       |
-| **Icons**   | Lucide React                                 |
-| **Backend** | Node.js, Express 5                           |
-| **Database**| MongoDB (via Mongoose) / In-Memory Server    |
-| **AI/OCR**  | Google Generative AI (Gemini)                |
-| **Hosting** | Vercel (frontend) + Render (backend)         |
+### Frontend
+- **React.js** – Component-driven architecture
+- **React Router** – Client-side routing
+- **Context API** – Global state management
+- **Vanilla CSS** – Highly optimized, utility-free custom styling
+
+### Backend
+- **Node.js & Express.js** – Fast, non-blocking REST API
+- **MongoDB & Mongoose** – Flexible, NoSQL document storage
+- **JWT & bcryptjs** – Secure authentication and password hashing
 
 ---
 
@@ -118,86 +89,131 @@ GraVITal/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js** ≥ 18
-- **npm** ≥ 9
+- Node.js (v16 or higher)
+- MongoDB (local instance or MongoDB Atlas)
 
-### Installation
-
+### 1. Clone the repository
 ```bash
-# Clone the repository
-git clone https://github.com/darsh175223/GradeDarshan.git
-cd GradeDarshan
+git clone https://github.com/yourusername/GraVITal.git
+cd GraVITal
+```
 
-# Install dependencies
+### 2. Backend Setup
+```bash
+cd backend
 npm install
-
-# Create .env file (optional — for OCR and cloud features)
-echo "GEMINI_API_KEY=your_google_ai_key" > .env
 ```
 
-### Development
-
+### 3. Frontend Setup
 ```bash
-# Start both frontend and backend concurrently
-npm run dev
-
-# Or start them separately:
-npm run dev:frontend   # Vite dev server (http://localhost:5173)
-npm run dev:backend    # Express API (http://localhost:5000)
-```
-
-### Production Build
-
-```bash
-npm run build      # Output to dist/
-npm run preview    # Preview the production build locally
+cd ../
+npm install
 ```
 
 ---
 
-## 🌐 Deployment
+## 🔐 Environment Variables
 
-### Frontend (Vercel)
-The project includes a `vercel.json` for zero-config deployment:
-```bash
-npx vercel --prod
+Create a `.env` file in the `backend` directory and configure the following variables:
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_super_secret_jwt_key
 ```
 
-### Backend (Render)
-A `render.yaml` is included for one-click deployment on Render.
+---
+
+## 🚦 Usage Guide
+
+1. **Start the Backend Server**
+   ```bash
+   cd backend
+   npm run dev
+   ```
+
+2. **Start the Frontend Application**
+   ```bash
+   # From the root directory
+   npm run dev
+   ```
+
+3. Open your browser and navigate to `http://localhost:5173` (or the port specified by Vite/React).
 
 ---
 
-## 📸 Screenshots
+## 🔌 API Endpoints
 
-| Dark Mode | Light Mode |
-|-----------|------------|
-| Premium dark glassmorphic dashboard with glowing particle background | Clean, bright interface with rich contrast particles |
-
----
-
-## 🧠 Key Design Decisions
-
-1. **No heavy animation libraries** — All animations use CSS transitions and `requestAnimationFrame` for maximum performance
-2. **CSS Custom Properties for theming** — A single `[data-theme]` attribute swap changes the entire UI without re-renders
-3. **Accordion via `max-height`** — Semester card expand/collapse uses stable `max-height` transitions instead of error-prone height: auto hacks
-4. **Particle count scales with viewport** — ~1 particle per 7000px² ensures smooth 60fps on any screen size
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `POST` | `/api/auth/register` | Register a new user (VIT Email required) | No |
+| `POST` | `/api/auth/login` | Authenticate user and issue token | No |
+| `GET`  | `/api/gpa/:username` | Fetch user's saved GPA data | Yes |
+| `POST` | `/api/gpa/save-gpa` | Update user's academic records | Yes |
 
 ---
 
-## 👤 Author
+## 📂 Folder Structure
 
-**Darshan**  
-GitHub: [@Dev-withDarshan](https://github.com/Dev-withDarshan)
+```text
+GraVITal/
+├── backend/
+│   ├── models/           # Mongoose schemas (User.js)
+│   ├── routes/           # Express routes (authRoutes.js)
+│   ├── .env              # Environment configurations
+│   └── server.js         # Entry point for the backend
+├── src/
+│   ├── components/       # Reusable React components
+│   ├── context/          # React Context (AuthContext, ThemeContext)
+│   ├── utils/            # Helper functions
+│   ├── App.jsx           # Main application routing
+│   └── main.jsx          # React DOM render entry
+├── public/               # Static assets
+├── package.json          # Frontend dependencies
+└── README.md
+```
+
+---
+
+## 🛡 Security Notes
+
+GraVITal takes security seriously:
+- **VIT Email Validation:** Registration aggressively validates against the `@vitstudent.ac.in` domain on both the frontend and backend.
+- **Password Security:** Passwords are salted and hashed using `bcryptjs` before persisting to the database.
+- **JWT Sessions:** Authentication is stateless and relies on JWTs, eliminating server-side session vulnerabilities.
+- **Input Sanitization:** All user inputs (usernames, emails) are trimmed and normalized to prevent injection or padding attacks.
+
+---
+
+## 🛣 Future Improvements
+
+- [ ] **OAuth Integration:** One-click Google Login restricted to VIT Workspace.
+- [ ] **Historical Analytics:** Visual charts mapping CGPA progress over 8 semesters.
+- [ ] **Course Database:** Auto-fetch credit weights based on standardized course codes.
+- [ ] **Export to PDF:** Download detailed semester reports.
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions to make GraVITal even better! 
+
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature/your-feature-name`.
+3. Commit your changes: `git commit -m 'Add some feature'`.
+4. Push to the branch: `git push origin feature/your-feature-name`.
+5. Open a pull request.
 
 ---
 
 ## 📄 License
 
-This project is for personal/educational use.
+This project is licensed under the MIT License.
 
 ---
 
-<p align="center">
-  Built with ❤️ and a lot of ☕
-</p>
+## 👨‍💻 Author
+
+**Darshan**  
+*Lead Developer & UI/UX Architect*  
+[GitHub](https://github.com/Dev-withDarshan) • [LinkedIn](https://www.linkedin.com/in/kdarshan2256/)

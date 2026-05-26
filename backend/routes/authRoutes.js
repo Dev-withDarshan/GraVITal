@@ -11,27 +11,35 @@ router.get("/test", (req, res) => {
 // Register Route
 const registerHandler = async (req, res) => {
   try {
-    const username = req.body.username.trim();
+    const username = req.body.username?.trim();
+    const email = req.body.email?.trim();
     const { password } = req.body;
 
-    console.log(`Register request received for: ${username ? username : 'unknown'}`);
+    console.log(`Register request received for: ${username ? username : 'unknown'} with email: ${email}`);
+
+    if (!email || !email.endsWith('@vitstudent.ac.in')) {
+      return res.status(400).json({ error: "A valid VIT email is required." });
+    }
 
     const existingUser = await User.findOne({ 
-      username: username 
-    }).collation({ locale: 'en', strength: 2 }); // ✅ Case-sensitive collation
-    
+      $or: [{ username: username }, { email: email }] 
+    });
     if (existingUser) {
-      return res.status(400).json({ error: "User already exists. Please choose a different username." });
+      if (existingUser.username === username) {
+        return res.status(400).json({ error: "User already exists. Please choose a different username." });
+      }
+      return res.status(400).json({ error: "Email already registered." });
     }
 
     const user = new User({ 
       username: username, 
+      email: email,
       password 
     });
 
     console.log("SAVING USER...");
 
-    await user.save(); // 🔥 THIS MUST RUN
+    await user.save();
 
     console.log("USER SAVED:", user);
 
@@ -47,7 +55,6 @@ const registerHandler = async (req, res) => {
   }
 };
 
-// Map both /register and /signup to the same handler to not break existing logic
 router.post('/register', registerHandler);
 router.post('/signup', registerHandler);
 
@@ -55,16 +62,30 @@ router.post('/signup', registerHandler);
 router.post('/login', async (req, res) => {
   const { password } = req.body;
   const username = req.body.username?.trim();
-  if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
+
+  // 🔥 DEBUG LINE (VERY IMPORTANT)
+  console.log("🔥 LOGIN USERNAME RECEIVED:", username);
+
+  if (!username || !password) 
+    return res.status(400).json({ error: 'Username and password required.' });
 
   try {
-    const user = await User.findOne({ username: username }).collation({ locale: 'en', strength: 2 }); // ✅ Case-sensitive collation
-    if (!user) return res.status(404).json({ error: 'User not found. Please sign up.' });
+    const user = await User.findOne({ username: username });
+
+    if (!user) 
+      return res.status(404).json({ error: 'User not found. Please sign up.' });
 
     const isMatch = await user.comparePassword(password);
-    if (!isMatch) return res.status(401).json({ error: 'Incorrect password.' });
 
-    res.json({ success: true, message: 'Logged in successfully.', gpaData: user.gpaData });
+    if (!isMatch) 
+      return res.status(401).json({ error: 'Incorrect password.' });
+
+    res.json({ 
+      success: true, 
+      message: 'Logged in successfully.', 
+      gpaData: user.gpaData 
+    });
+
   } catch (err) {
     console.error('Login Error:', err);
     res.status(500).json({ error: 'Server error during login.' });

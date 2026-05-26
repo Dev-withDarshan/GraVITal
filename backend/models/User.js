@@ -8,6 +8,12 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     trim: true
   },
+  email: {
+    type: String,
+    trim: true,
+    unique: true,
+    sparse: true // Allows multiple users without an email (old users)
+  },
   password: {
     type: String,
     required: true

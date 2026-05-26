@@ -64,9 +64,10 @@ export default function Navbar() {
   };
 
   const isOnDashboard = location.pathname === '/dashboard';
+  const isAuthScreen = location.pathname === '/login';
 
   return (
-    <nav className="navbar-premium">
+    <nav className={`navbar-premium ${isAuthScreen ? 'navbar-hidden-until-hover' : ''}`}>
       <div className="navbar-inner">
         {/* ── LEFT: Logo ── */}
         <div className="navbar-left">

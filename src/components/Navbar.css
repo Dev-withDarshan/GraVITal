@@ -635,7 +635,31 @@
     0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
 }
 
-/* Hover ring on avatar trigger */
 .avatar-trigger:hover .avatar-small {
   box-shadow: 0 0 0 2px #a855f7 !important;
+}
+
+/* ── Auth Screen Navbar Hover Reveal ── */
+.navbar-hidden-until-hover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateY(calc(-100% - 25px));
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-hidden-until-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -65px; /* 40px into the screen + 25px offset */
+  left: 0;
+  right: 0;
+  height: 65px;
+  background: transparent;
+}
+
+.navbar-hidden-until-hover:hover,
+.navbar-hidden-until-hover:focus-within {
+  transform: translateY(0);
 }

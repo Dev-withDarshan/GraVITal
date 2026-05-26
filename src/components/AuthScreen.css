@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
   padding: 20px;
   position: relative;
   overflow: hidden;
@@ -83,8 +83,8 @@
 @media (max-width: 480px) {
   .auth-container {
     padding: 16px;
-    align-items: flex-start;
-    padding-top: 40px;
+    align-items: center;
+    height: 100vh;
   }
 
   .auth-card {
