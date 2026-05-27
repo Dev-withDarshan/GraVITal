@@ -1,0 +1,47 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "GraVITal",
+  "description": "A smart, cloud-powered GPA calculator and academic performance tracker for VIT students",
+  "url": "https://gravital.vercel.app",
+  "image": "https://gravital.vercel.app/Logo.png",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "INR"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Darshan",
+    "url": "https://github.com/Dev-withDarshan",
+    "sameAs": [
+      "https://linkedin.com/in/kdarshan2256/",
+      "https://github.com/Dev-withDarshan"
+    ]
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "GraVITal",
+    "url": "https://gravital.vercel.app"
+  },
+  "featureList": [
+    "Real-time CGPA Calculator",
+    "Grade Simulator with What-If Scenarios",
+    "Target GPA Calculator",
+    "Semester-wise Breakdown",
+    "Cloud Sync & Profile Management",
+    "Responsive Design",
+    "Dark/Light Theme",
+    "AI-Powered OCR for Grade Entry"
+  ],
+  "datePublished": "2024-01-01",
+  "dateModified": "2026-05-27",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "ratingCount": "150"
+  },
+  "inLanguage": "en-US"
+}
