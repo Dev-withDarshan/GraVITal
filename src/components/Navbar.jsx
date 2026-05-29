@@ -9,7 +9,7 @@ import { capitalizeName } from '../utils/helpers';
 import './Navbar.css';
 
 export default function Navbar() {
-  const { currentUser, logout, profileData } = useAuth();
+  const { currentUser, isGuest, logout, profileData } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { activeTab, setActiveTab, onSave, saveStatus } = useDashboardTab();
   const navigate = useNavigate();
@@ -19,8 +19,8 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const isAuthenticated = !!currentUser && currentUser !== 'guest';
-  const isGuest = currentUser === 'guest';
+  const isAuthenticated = !!currentUser;
+  // isGuest comes from AuthContext (localStorage-backed flag)
 
   const handleLogoClick = () => {
     navigate('/');
@@ -111,9 +111,9 @@ export default function Navbar() {
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          {currentUser ? (
+          {(isAuthenticated || isGuest) ? (
             <div className="auth-actions-logged-in">
-              {currentUser !== 'guest' && onSave && (
+              {isAuthenticated && onSave && (
                 <MagneticButton
                   className="btn-primary navbar-save-btn"
                   onClick={onSave}
@@ -124,7 +124,7 @@ export default function Navbar() {
                 </MagneticButton>
               )}
 
-              {currentUser !== 'guest' ? (
+              {isAuthenticated ? (
                 <div className="avatar-dropdown-wrapper" ref={dropdownRef}>
                   <button
                     className="avatar-trigger"
@@ -178,6 +178,7 @@ export default function Navbar() {
                   )}
                 </div>
               ) : (
+                // Guest user: show Sign In button to prompt real login
                 <MagneticButton
                   className="btn-secondary btn-nav-logout"
                   onClick={() => { logout(); navigate('/login'); }}

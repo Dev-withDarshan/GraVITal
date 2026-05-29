@@ -295,9 +295,9 @@ export function Footer() {
       </div>
       <div className="prof-footer-right">
         <div className="prof-footer-links">
-          <a href="#privacy" onClick={(e) => e.preventDefault()}>Privacy Policy</a>
-          <a href="#terms" onClick={(e) => e.preventDefault()}>Terms of Use</a>
-          <a href="mailto:darshanedu2256@gmail.com">Contact Us</a>
+          <a href="#privacy" onClick={(e) => e.preventDefault()}>Privacy Protocol</a>
+          <a href="#terms" onClick={(e) => e.preventDefault()}>GraVITal Terms</a>
+          <a href="mailto:darshanedu2256@gmail.com">System Support</a>
         </div>
         <div className="prof-footer-socials">
           <a href="https://www.instagram.com/_darshan2256?igsh=bjhpemsyNDh6emgz" target="_blank" rel="noopener noreferrer" className="prof-social-link" aria-label="Instagram">

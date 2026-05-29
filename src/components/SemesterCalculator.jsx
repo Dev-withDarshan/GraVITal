@@ -70,6 +70,155 @@ export function parseVtopText(text) {
   return subjects;
 }
 
+export function parseVtopTimetable(text) {
+  const lines = text.split("\n");
+  const subjects = [];
+
+  const TIMETABLE_COURSE_TYPES = [
+    "Embedded Theory and Lab",
+    "Embedded Theory and Project",
+    "Embedded Lab and Project",
+    "Theory Only",
+    "Lab Only",
+    "Project Only",
+    "Online Course",
+    "Soft Skill"
+  ];
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    // Try parsing with tabs first
+    if (trimmed.includes("\t")) {
+      const tokens = trimmed.split("\t");
+      if (tokens.length >= 10) {
+        const courseCode = tokens[2]?.trim();
+        const courseTitle = tokens[3]?.trim();
+        const courseType = tokens[4]?.trim();
+        const credits = parseFloat(tokens[9]?.trim());
+
+        if (courseCode && courseTitle && !isNaN(credits)) {
+          const isLab = courseType === "Lab Only" || courseCode.endsWith("P") || courseTitle.toLowerCase().includes("lab");
+          const type = isLab ? "lab" : "theory";
+
+          subjects.push({
+            id: crypto.randomUUID(),
+            name: courseTitle,
+            credits: credits,
+            grade: 'S',
+            type: type
+          });
+          return;
+        }
+      }
+    }
+
+    // Fallback: If no tabs, split by regex / spaces
+    const codeMatch = trimmed.match(/\b([A-Z]{3,4}\d{3,4}[A-Z]?)\b/i);
+    if (!codeMatch) return;
+
+    const courseCode = codeMatch[1].toUpperCase();
+    const codeIndex = trimmed.indexOf(codeMatch[1]);
+
+    let foundType = "";
+    let foundTypeIdx = -1;
+
+    for (let type of TIMETABLE_COURSE_TYPES) {
+      const idx = trimmed.toLowerCase().indexOf(type.toLowerCase());
+      if (idx !== -1 && idx > codeIndex) {
+        foundType = type;
+        foundTypeIdx = idx;
+        break;
+      }
+    }
+
+    let courseTitle = "";
+    let credits = 3.0;
+
+    if (foundTypeIdx !== -1) {
+      courseTitle = trimmed.substring(codeIndex + courseCode.length, foundTypeIdx).trim();
+      const afterType = trimmed.substring(foundTypeIdx + foundType.length).trim();
+      const tokensAfter = afterType.split(/\s+/);
+      if (tokensAfter.length >= 5) {
+        const potentialCredits = parseFloat(tokensAfter[4]);
+        if (!isNaN(potentialCredits)) {
+          credits = potentialCredits;
+        }
+      }
+    } else {
+      const afterCode = trimmed.substring(codeIndex + courseCode.length).trim();
+      const tokens = afterCode.split(/\s+/);
+      if (tokens.length > 0) {
+        let titleParts = [];
+        for (let token of tokens) {
+          if (/^\d/.test(token) || token.includes("+")) {
+            break;
+          }
+          titleParts.push(token);
+        }
+        courseTitle = titleParts.join(" ").trim();
+      }
+    }
+
+    if (!courseTitle) {
+      courseTitle = courseCode;
+    }
+
+    const isLab = foundType === "Lab Only" || courseCode.endsWith("P") || courseTitle.toLowerCase().includes("lab");
+    const type = isLab ? "lab" : "theory";
+
+    subjects.push({
+      id: crypto.randomUUID(),
+      name: courseTitle,
+      credits: credits,
+      grade: 'S',
+      type: type
+    });
+  });
+
+  return subjects;
+}
+
+export function parseVTOPData(text) {
+  // Step 1: Split into blocks using course code pattern
+  const blocks = text.split(/\n(?=\d+\s*\n)/); // split at Sl.No
+
+  const subjects = [];
+
+  blocks.forEach(block => {
+    // Extract CODE + NAME
+    const courseMatch = block.match(/([A-Z]{4}\d{3}[A-Z])\s*-\s*(.+)/);
+
+    if (!courseMatch) return;
+
+    const code = courseMatch[1];
+    let name = courseMatch[2].trim();
+
+    // Extract TYPE
+    let type = "theory";
+    if (/\(.*Lab.*\)/i.test(block)) {
+      type = "lab";
+    }
+
+    // Extract CREDITS (first decimal number in block after course code to avoid matching digits inside the code)
+    const afterCode = block.substring(block.indexOf(code) + code.length);
+    const creditMatch = afterCode.match(/\b\d+(\.\d+)?\b/);
+    const credits = creditMatch ? parseFloat(creditMatch[0]) : 0;
+
+    subjects.push({
+      id: crypto.randomUUID(),
+      name,
+      credits,
+      grade: 'S',
+      type,
+      code
+    });
+  });
+
+  return subjects;
+}
+
 // VIT Grading System
 const GRADE_POINTS = {
   S: 10, A: 9, B: 8, C: 7, D: 6, E: 5, F: 0, N: 0
@@ -153,9 +302,69 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
   const [labOpen, setLabOpen] = useState(true);
 
   const [isAutofillModalOpen, setIsAutofillModalOpen] = useState(false);
-  const [autofillTab, setAutofillTab] = useState('vtop'); // 'vtop' or 'ocr'
+  const [autofillTab, setAutofillTab] = useState('timetable'); // 'timetable', 'vtop', or 'ocr'
   const [vtopText, setVtopText] = useState('');
+  const [timetableText, setTimetableText] = useState('');
   const [replaceSubjects, setReplaceSubjects] = useState(true);
+
+  const handleTimetableAutofill = () => {
+    if (!timetableText.trim()) {
+      toast.error("Please paste your VTOP registration or timetable text first!");
+      return;
+    }
+
+    try {
+      // Auto-detect format: if there's a pattern of CODE - NAME, parse as registration text
+      const isRegistrationText = /([A-Z]{4}\d{3}[A-Z])\s*-\s*(.+)/.test(timetableText);
+      const parsed = isRegistrationText
+        ? parseVTOPData(timetableText)
+        : parseVtopTimetable(timetableText);
+
+      if (parsed.length === 0) {
+        toast.error("No valid subjects detected. Please make sure the format is correct.");
+        return;
+      }
+
+      const newTheory = parsed.filter(s => s.type === 'theory');
+      const newLab = parsed.filter(s => s.type === 'lab');
+
+      if (replaceSubjects) {
+        setTheorySubjects(newTheory.length > 0 ? newTheory : DEFAULT_THEORY.map(() => ({ id: crypto.randomUUID(), name: '', credits: 3, grade: 'S' })));
+        setLabSubjects(newLab.length > 0 ? newLab : DEFAULT_LAB.map(() => ({ id: crypto.randomUUID(), name: '', credits: 1, grade: 'S' })));
+      } else {
+        let currentTheory = theorySubjects.length === DEFAULT_THEORY.length && theorySubjects[0].name === '' ? [] : [...theorySubjects];
+        let currentLabs = labSubjects.length === DEFAULT_LAB.length && labSubjects[0].name === '' ? [] : [...labSubjects];
+
+        const existingNames = new Set([...currentTheory, ...currentLabs].map(s => s.name.trim().toLowerCase()));
+
+        const uniqueNewTheory = [];
+        const uniqueNewLabs = [];
+
+        newTheory.forEach(s => {
+          if (!existingNames.has(s.name.trim().toLowerCase())) {
+            existingNames.add(s.name.trim().toLowerCase());
+            uniqueNewTheory.push(s);
+          }
+        });
+
+        newLab.forEach(s => {
+          if (!existingNames.has(s.name.trim().toLowerCase())) {
+            existingNames.add(s.name.trim().toLowerCase());
+            uniqueNewLabs.push(s);
+          }
+        });
+
+        setTheorySubjects([...currentTheory, ...uniqueNewTheory]);
+        setLabSubjects([...currentLabs, ...uniqueNewLabs]);
+      }
+
+      toast.success("Subjects loaded successfully 🚀");
+      setIsAutofillModalOpen(false);
+      setTimetableText('');
+    } catch (err) {
+      toast.error("Failed to parse VTOP text: " + err.message);
+    }
+  };
 
   const handleVtopAutofill = () => {
     if (!vtopText.trim()) {
@@ -639,10 +848,16 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
 
             <div className="autofill-modal-tabs">
               <button
+                className={`autofill-tab ${autofillTab === 'timetable' ? 'active' : ''}`}
+                onClick={() => setAutofillTab('timetable')}
+              >
+                Import Time Table
+              </button>
+              <button
                 className={`autofill-tab ${autofillTab === 'vtop' ? 'active' : ''}`}
                 onClick={() => setAutofillTab('vtop')}
               >
-                Paste VTOP Text
+                Paste grade table
               </button>
               <button
                 className={`autofill-tab ${autofillTab === 'ocr' ? 'active' : ''}`}
@@ -656,15 +871,85 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
               {autofillTab === 'vtop' ? (
                 <div className="vtop-autofill-pane">
                   <p className="autofill-pane-desc">
-                    Log in to VTOP, copy your entire grade table (including the headers or row numbers), and paste it below.
+                    Log in to VTOP, copy your entire grade table from Examination -{'>'} Grades, and paste it below. (Reference format shown below)
                   </p>
+
                   <label className="vtop-textarea-label">Paste your VTOP Grade Table here</label>
                   <textarea
                     className="vtop-textarea"
-                    placeholder="Example:&#10;1&#9;BCHY102N&#9;Environmental Sciences&#9;Online Course&#9;0.0&#9;0.0&#9;0.0&#9;2.0&#9;AG&#9;71&#9;P&#10;2&#9;BCSE103E&#9;Computer Programming: Java&#9;Embedded Theory and Lab&#9;1.0&#9;2.0&#9;0.0&#9;3.0&#9;AG&#9;92&#9;S"
+                    placeholder="Paste your VTOP Grade Table here..."
                     value={vtopText}
                     onChange={(e) => setVtopText(e.target.value)}
                   />
+
+                  <div className="vtop-example-table-container" style={{ marginTop: '16px' }}>
+                    <table className="vtop-example-table">
+                      <thead>
+                        <tr>
+                          <th rowSpan="2">Sl.No.</th>
+                          <th rowSpan="2">Course Code</th>
+                          <th rowSpan="2">Course Title</th>
+                          <th rowSpan="2">Course Type</th>
+                          <th colSpan="4" style={{ textAlign: 'center' }}>Credits</th>
+                          <th rowSpan="2">Grading Type</th>
+                          <th rowSpan="2">Grand Total</th>
+                          <th rowSpan="2">Grade</th>
+                          <th rowSpan="2">View Mark</th>
+                        </tr>
+                        <tr>
+                          <th>L</th>
+                          <th>P</th>
+                          <th>J</th>
+                          <th>C</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>1</td>
+                          <td>BCSE101E</td>
+                          <td>Computer Programming: Python</td>
+                          <td>Embedded Theory and Lab</td>
+                          <td>1.0</td>
+                          <td>2.0</td>
+                          <td>0.0</td>
+                          <td>3.0</td>
+                          <td>AG</td>
+                          <td>93</td>
+                          <td>S</td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td>2</td>
+                          <td>BEEE102L</td>
+                          <td>Basic Electrical and Electronics Engineering</td>
+                          <td>Theory Only</td>
+                          <td>3.0</td>
+                          <td>0.0</td>
+                          <td>0.0</td>
+                          <td>3.0</td>
+                          <td>RG</td>
+                          <td>85</td>
+                          <td>A</td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td>3</td>
+                          <td>BEEE102P</td>
+                          <td>Basic Electrical and Electronics Engineering Lab</td>
+                          <td>Lab Only</td>
+                          <td>0.0</td>
+                          <td>1.0</td>
+                          <td>0.0</td>
+                          <td>1.0</td>
+                          <td>AG</td>
+                          <td>99</td>
+                          <td>S</td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
                   <div className="autofill-options">
                     <label className="autofill-checkbox-label">
                       <input
@@ -679,10 +964,103 @@ export default function SemesterCalculator({ initialData, overallData, onChange,
                     Auto Fill Subjects
                   </button>
                 </div>
+              ) : autofillTab === 'timetable' ? (
+                <div className="vtop-autofill-pane">
+                  <p className="autofill-pane-desc">
+                    Log in to VTOP, copy your course registration text or timetable, and paste it below. (Reference format shown below)
+                  </p>
+
+                  <label className="vtop-textarea-label">Paste VTOP Registration Text / Timetable here</label>
+                  <textarea
+                    className="vtop-textarea"
+                    placeholder="Paste your VTOP Registration Text or Timetable here..."
+                    value={timetableText}
+                    onChange={(e) => setTimetableText(e.target.value)}
+                  />
+
+                  <div className="vtop-example-table-container" style={{ marginTop: '16px' }}>
+                    <table className="vtop-example-table">
+                      <thead>
+                        <tr>
+                          <th>Sl.No</th>
+                          <th>Class Group</th>
+                          <th>Course</th>
+                          <th>Credits</th>
+                          <th>Category</th>
+                          <th>Course Option</th>
+                          <th>Class Id</th>
+                          <th>Slot/ Venue</th>
+                          <th>Faculty Details</th>
+                          <th>Registered / Updated Date & Time</th>
+                          <th>Attendance Date/ Type</th>
+                          <th>Status & Ref. No.</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>1</td>
+                          <td>General Freshers</td>
+                          <td>BCSE101E - Computer Programming: Python<br/>( Embedded Theory )</td>
+                          <td>1.0</td>
+                          <td>Foundation Core</td>
+                          <td>Regular</td>
+                          <td>VL2024250107560</td>
+                          <td>TCC2 -<br/>PRP124</td>
+                          <td>SELVA RANI B -<br/>SCORE</td>
+                          <td>28-Jul-2024 04:39</td>
+                          <td>29-Jul-2024<br/>- Manual</td>
+                          <td>Registered and Approved</td>
+                        </tr>
+                        <tr>
+                          <td>2</td>
+                          <td>General Freshers</td>
+                          <td>BCSE101E - Computer Programming: Python<br/>( Embedded Lab )</td>
+                          <td>2.0</td>
+                          <td>Foundation Core</td>
+                          <td>Regular</td>
+                          <td>VL2024250107561</td>
+                          <td>L9+L10+L13+L14 -<br/>SJT218</td>
+                          <td>SELVA RANI B -<br/>SCORE</td>
+                          <td>28-Jul-2024 04:39</td>
+                          <td>29-Jul-2024<br/>- Manual</td>
+                          <td>Registered and Approved</td>
+                        </tr>
+                        <tr>
+                          <td>3</td>
+                          <td>General Freshers</td>
+                          <td>BEEE102L - Basic Electrical and Electronics Engineering<br/>( Theory Only )</td>
+                          <td>3.0</td>
+                          <td>Foundation Core</td>
+                          <td>Regular</td>
+                          <td>VL2024250106644</td>
+                          <td>G2+TG2 -<br/>PRP124</td>
+                          <td>ARUN N -<br/>SELECT</td>
+                          <td>28-Jul-2024 04:39</td>
+                          <td>29-Jul-2024<br/>- Manual</td>
+                          <td>Registered and Approved</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="autofill-options">
+                    <label className="autofill-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={replaceSubjects}
+                        onChange={(e) => setReplaceSubjects(e.target.checked)}
+                      />
+                      <span>Replace existing subjects (otherwise append)</span>
+                    </label>
+                  </div>
+                  <button className="btn-primary vtop-submit-btn" onClick={handleTimetableAutofill}>
+                    Auto Fill from VTOP
+                  </button>
+                </div>
               ) : (
                 <div className="ocr-autofill-pane">
                   <p className="autofill-pane-desc">
-                    Upload or drag screenshots of your VTOP grade page to automatically scan and import course codes, names, credits, and grades.
+                    <strong>Currently under development...</strong>Upload or drag screenshots of your VTOP grade page to automatically scan and import course codes, names, credits, and grades.
                   </p>
                   <div className="ocr-dropzone">
                     <input

@@ -15,8 +15,8 @@ const getConsistencyDetails = (stdDev) => {
 };
 
 export default function AnalyzeModal({ semesters, onClose }) {
-  const { currentUser, logout } = useAuth();
-  const isGuest = currentUser === 'guest';
+  const { isGuest, logout } = useAuth();
+  // isGuest is a localStorage-backed flag — no backend calls triggered for guests
 
   // Target inputs
   const [targetCGPA, setTargetCGPA] = useState(9.0);

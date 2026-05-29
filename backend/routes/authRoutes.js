@@ -55,11 +55,7 @@ router.post('/register', authLimiter, async (req, res) => {
   }
 });
 
-// Alias
-router.post('/signup', authLimiter, async (req, res) => {
-  req.url = '/register';
-  router.handle(req, res);
-});
+// Note: Use /register endpoint for signup — /signup alias removed (router.handle re-dispatch is unreliable)
 
 // ── Login ─────────────────────────────────────────────────────
 router.post('/login', authLimiter, async (req, res) => {

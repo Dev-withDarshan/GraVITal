@@ -3,10 +3,11 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function ProtectedRoute({ children }) {
-  const { currentUser, isLoading } = useAuth();
-  const token = localStorage.getItem('token');
+  const { isLoading } = useAuth();
+  const hasToken = !!localStorage.getItem('token');
+  const isGuest = localStorage.getItem('isGuest') === 'true';
 
-  console.log('[ProtectedRoute]', { currentUser, isLoading, hasToken: !!token });
+  console.log('[ProtectedRoute]', { isLoading, hasToken, isGuest });
 
   // Still initializing session from localStorage token on first load
   if (isLoading) {
@@ -17,14 +18,11 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
-  // No token in localStorage → definitely not authenticated
-  // This check is synchronous and immune to React state batching delays.
-  // The backend enforces real security on every API call via authMiddleware.
-  if (!token) {
+  // No token AND not a guest → redirect to login
+  if (!hasToken && !isGuest) {
     return <Navigate to="/login" replace />;
   }
 
-  // Token exists — allow access. If the token is expired the backend will
-  // return 401 on the first API call, which triggers logout in AuthContext.
+  // Authenticated user (has JWT) or guest (localStorage flag) — allow access
   return children ? children : <Outlet />;
 }

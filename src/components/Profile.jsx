@@ -31,7 +31,7 @@ const BRANCH_OPTIONS = [
 const YEAR_OPTIONS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
 export default function Profile() {
-  const { profileData, updateProfileData, uploadProfilePhoto, currentUser, userData, changePassword } = useAuth();
+  const { profileData, updateProfileData, uploadProfilePhoto, currentUser, isGuest, userData, changePassword } = useAuth();
   const { theme, toggleTheme, selectTheme } = useTheme();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -269,7 +269,7 @@ export default function Profile() {
     return name.trim().charAt(0).toUpperCase();
   };
 
-  const isGuest = currentUser === 'guest';
+  // isGuest comes from AuthContext (localStorage-backed flag, no backend involvement)
 
   // Compute dynamic user stats
   const semesters = userData?.overall?.semesters || [];

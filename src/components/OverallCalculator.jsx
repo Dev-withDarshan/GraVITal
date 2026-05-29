@@ -397,15 +397,85 @@ function SemesterCard({ sem, index, semesters, onUpdate, onRemove, expanded, onT
                     <div className="autofill-modal-body">
                       <div className="vtop-autofill-pane">
                         <p className="autofill-pane-desc">
-                          Log in to VTOP, copy your entire grade table (including the headers or row numbers), and paste it below.
+                          Log in to VTOP, copy your entire grade table from Examination -{'>'} Grades, and paste it below. (Reference format shown below)
                         </p>
+
                         <label className="vtop-textarea-label">Paste your VTOP Grade Table here</label>
                         <textarea
                           className="vtop-textarea"
-                          placeholder={"Example:\n1\tBCHY102N\tEnvironmental Sciences\tOnline Course\t0.0\t0.0\t0.0\t2.0\tAG\t71\tP\n2\tBCSE103E\tComputer Programming: Java\tEmbedded Theory and Lab\t1.0\t2.0\t0.0\t3.0\tAG\t92\tS"}
+                          placeholder="Paste your VTOP Grade Table here..."
                           value={vtopText}
                           onChange={(e) => setVtopText(e.target.value)}
                         />
+
+                        <div className="vtop-example-table-container" style={{ marginTop: '16px' }}>
+                          <table className="vtop-example-table">
+                            <thead>
+                              <tr>
+                                <th rowSpan="2">Sl.No.</th>
+                                <th rowSpan="2">Course Code</th>
+                                <th rowSpan="2">Course Title</th>
+                                <th rowSpan="2">Course Type</th>
+                                <th colSpan="4" style={{ textAlign: 'center' }}>Credits</th>
+                                <th rowSpan="2">Grading Type</th>
+                                <th rowSpan="2">Grand Total</th>
+                                <th rowSpan="2">Grade</th>
+                                <th rowSpan="2">View Mark</th>
+                              </tr>
+                              <tr>
+                                <th>L</th>
+                                <th>P</th>
+                                <th>J</th>
+                                <th>C</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>1</td>
+                                <td>BCSE101E</td>
+                                <td>Computer Programming: Python</td>
+                                <td>Embedded Theory and Lab</td>
+                                <td>1.0</td>
+                                <td>2.0</td>
+                                <td>0.0</td>
+                                <td>3.0</td>
+                                <td>AG</td>
+                                <td>93</td>
+                                <td>S</td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <td>2</td>
+                                <td>BEEE102L</td>
+                                <td>Basic Electrical and Electronics Engineering</td>
+                                <td>Theory Only</td>
+                                <td>3.0</td>
+                                <td>0.0</td>
+                                <td>0.0</td>
+                                <td>3.0</td>
+                                <td>RG</td>
+                                <td>85</td>
+                                <td>A</td>
+                                <td></td>
+                              </tr>
+                              <tr>
+                                <td>3</td>
+                                <td>BEEE102P</td>
+                                <td>Basic Electrical and Electronics Engineering Lab</td>
+                                <td>Lab Only</td>
+                                <td>0.0</td>
+                                <td>1.0</td>
+                                <td>0.0</td>
+                                <td>1.0</td>
+                                <td>AG</td>
+                                <td>99</td>
+                                <td>S</td>
+                                <td></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
                         <div className="autofill-options">
                           <label className="autofill-checkbox-label">
                             <input

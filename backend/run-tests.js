@@ -6,14 +6,14 @@ async function runTests() {
   try {
     // TEST 1: SERVER ALIVE
     console.log('🧪 TEST 1: SERVER ALIVE');
-    const res1 = await fetch('http://localhost:5000/');
+    const res1 = await fetch('https://gravital-backend.onrender.com/');
     const text1 = await res1.text();
     if (text1 === 'API Running 🚀') console.log('✅ PASS: Express server running\n');
     else console.log('❌ FAIL\n');
 
     // TEST 2: ROUTES CONNECTED
     console.log('🧪 TEST 2: ROUTES CONNECTED');
-    const res2 = await fetch('http://localhost:5000/api/auth/test');
+    const res2 = await fetch('https://gravital-backend.onrender.com/api/auth/test');
     const text2 = await res2.text();
     if (text2 === 'Working') console.log('✅ PASS: Routes mounted correctly\n');
     else console.log('❌ FAIL\n');
@@ -23,7 +23,7 @@ async function runTests() {
 
     // TEST 5: REGISTER API
     console.log('🧪 TEST 5: REGISTER API');
-    const res5 = await fetch('http://localhost:5000/api/auth/register', {
+    const res5 = await fetch('https://gravital-backend.onrender.com/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password: '123456' })
@@ -34,7 +34,7 @@ async function runTests() {
 
     // TEST 7: LOGIN API
     console.log('🧪 TEST 7: LOGIN API');
-    const res7 = await fetch('http://localhost:5000/api/auth/login', {
+    const res7 = await fetch('https://gravital-backend.onrender.com/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password: '123456' })
@@ -45,7 +45,7 @@ async function runTests() {
 
     // TEST 8: WRONG PASSWORD
     console.log('🧪 TEST 8: WRONG PASSWORD');
-    const res8 = await fetch('http://localhost:5000/api/auth/login', {
+    const res8 = await fetch('https://gravital-backend.onrender.com/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password: 'wrongpassword' })
@@ -56,7 +56,7 @@ async function runTests() {
 
     // TEST 9: NON-EXISTING USER
     console.log('🧪 TEST 9: NON-EXISTING USER');
-    const res9 = await fetch('http://localhost:5000/api/auth/login', {
+    const res9 = await fetch('https://gravital-backend.onrender.com/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: 'random999_nonexistent', password: '123456' })
@@ -68,7 +68,7 @@ async function runTests() {
     // TEST 10: SAVE GPA DATA
     console.log('🧪 TEST 10: SAVE GPA DATA');
     const dummyGpaData = { semesters: [{ semesterNumber: 1, gpa: 9.5 }] };
-    const res10 = await fetch('http://localhost:5000/api/gpa/save-gpa', {
+    const res10 = await fetch('https://gravital-backend.onrender.com/api/gpa/save-gpa', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, gpaData: dummyGpaData })
@@ -79,7 +79,7 @@ async function runTests() {
 
     // TEST 11: LOAD GPA DATA
     console.log('🧪 TEST 11: LOAD GPA DATA');
-    const res11 = await fetch(`http://localhost:5000/api/gpa/${username}`);
+    const res11 = await fetch(`https://gravital-backend.onrender.com/api/gpa/${username}`);
     const json11 = await res11.json();
     if (json11.success && json11.gpaData?.semesters?.[0]?.gpa === 9.5) {
       console.log('✅ PASS: GPA data loaded and verified successfully\n');

@@ -7,7 +7,7 @@ const testPayload = {
 async function test() {
   console.log("Sending request to backend...");
   try {
-    const res = await fetch("http://localhost:5000/api/scan-screenshot", {
+    const res = await fetch("https://gravital-backend.onrender.com/api/scan-screenshot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(testPayload)

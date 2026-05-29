@@ -17,11 +17,12 @@ import ScoreFlow from './components/ScoreFlow';
 const AppLayout = () => {
   const location = useLocation();
   const showParticles = location.pathname === '/' || location.pathname === '/login';
+  const showNavbar = location.pathname !== '/login';
 
   return (
     <>
       {showParticles && <ParticleBackground />}
-      <Navbar />
+      {showNavbar && <Navbar />}
       <div key={location.pathname} className="animate-mac-micromotion" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
         <Routes>
           <Route path="/" element={<LandingPage />} />

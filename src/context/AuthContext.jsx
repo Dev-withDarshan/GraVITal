@@ -5,15 +5,19 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
+// ── Guest flag helpers (localStorage-backed, no backend involvement) ──────────
+export const getIsGuest = () => localStorage.getItem('isGuest') === 'true';
+
 export const AuthProvider = ({ children }) => {
   // Use env var in production; fall back to localhost for local dev
-  const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API = import.meta.env.VITE_API_URL || 'https://gravital-backend.onrender.com';
 
-  const [currentUser, setCurrentUser] = useState(null);  // display username string
+  const [currentUser, setCurrentUser] = useState(null);  // display username string (null for guests)
   const [authEmail, setAuthEmail] = useState('');
   const [userData, setUserData] = useState(null);
   const [scoreFlowData, setScoreFlowData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(() => getIsGuest());
   const [profileData, setProfileData] = useState({
     name: '',
     email: '',
@@ -40,9 +44,8 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  // Profile localStorage key: fixed for auth users, username-based for guest
-  const getProfileKey = (user) =>
-    user === 'guest' ? `profile_data_${user}` : 'profile_data_local';
+  // Profile localStorage key (auth users only)
+  const getProfileKey = () => 'profile_data_local';
 
   // ── Load profile from backend (authenticated users only) ──────────────────
   const loadProfileData = async () => {
@@ -60,18 +63,17 @@ export const AuthProvider = ({ children }) => {
   // ── Rebuild profileData whenever currentUser/authEmail changes ─────────────
   useEffect(() => {
     if (currentUser) {
-      const PROFILE_KEY = getProfileKey(currentUser);
+      // Authenticated user — load from localStorage then merge backend data
+      const PROFILE_KEY = getProfileKey();
       const storedProfile = localStorage.getItem(PROFILE_KEY);
       const formattedDate = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      const authName = currentUser === 'guest' ? 'Guest User' : currentUser;
-      const authDerivedEmail = authEmail || (currentUser === 'guest' ? 'guest@example.com' : '');
 
       if (storedProfile) {
         const parsed = JSON.parse(storedProfile);
         const hasMemberSince = !!parsed.memberSince;
         const updated = {
-          name: parsed.name || authName,
-          email: authDerivedEmail || parsed.email || '',
+          name: parsed.name || currentUser,
+          email: authEmail || parsed.email || '',
           profilePhoto: parsed.profilePhoto || '',
           branch: parsed.branch || '',
           year: parsed.year || '',
@@ -85,8 +87,8 @@ export const AuthProvider = ({ children }) => {
         setProfileData(updated);
       } else {
         const defaultProf = {
-          name: authName,
-          email: authDerivedEmail,
+          name: currentUser,
+          email: authEmail,
           profilePhoto: '',
           branch: '',
           year: '',
@@ -100,20 +102,40 @@ export const AuthProvider = ({ children }) => {
         setProfileData(defaultProf);
       }
 
-      // Merge backend profile data (photo, email, memberSince) for auth users
-      if (currentUser !== 'guest') {
-        loadProfileData().then((backendProfile) => {
-          if (backendProfile) {
-            setProfileData(prev => ({
-              ...prev,
-              profilePhoto: backendProfile.profilePhoto || prev.profilePhoto || '',
-              email: backendProfile.email || prev.email || '',
-              memberSince: backendProfile.memberSince
-                ? new Date(backendProfile.memberSince).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-                : prev.memberSince
-            }));
-          }
-        });
+      // Merge backend profile data (photo, email, memberSince)
+      loadProfileData().then((backendProfile) => {
+        if (backendProfile) {
+          setProfileData(prev => ({
+            ...prev,
+            profilePhoto: backendProfile.profilePhoto || prev.profilePhoto || '',
+            email: backendProfile.email || prev.email || '',
+            memberSince: backendProfile.memberSince
+              ? new Date(backendProfile.memberSince).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+              : prev.memberSince
+          }));
+        }
+      });
+    } else if (isGuest) {
+      // Guest user — use a minimal local profile, no backend
+      const formattedDate = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      const stored = localStorage.getItem('profile_data_guest');
+      if (stored) {
+        setProfileData(JSON.parse(stored));
+      } else {
+        const guestProfile = {
+          name: 'Guest User',
+          email: 'guest@example.com',
+          profilePhoto: '',
+          branch: '',
+          year: '',
+          targetCGPA: '',
+          gradingSystem: 'VIT Grading',
+          emailNotifications: true,
+          twoFactorEnabled: true,
+          memberSince: formattedDate
+        };
+        localStorage.setItem('profile_data_guest', JSON.stringify(guestProfile));
+        setProfileData(guestProfile);
       }
     } else {
       setProfileData({
@@ -122,23 +144,32 @@ export const AuthProvider = ({ children }) => {
         emailNotifications: true, twoFactorEnabled: true, memberSince: ''
       });
     }
-  }, [currentUser, authEmail]);
+  }, [currentUser, authEmail, isGuest]);
 
   const updateProfileData = useCallback((newData) => {
     if (currentUser) {
-      const PROFILE_KEY = getProfileKey(currentUser);
+      // Authenticated user — save to localStorage (excluding profilePhoto which goes via ImageKit)
+      const PROFILE_KEY = getProfileKey();
       const { profilePhoto, ...safeData } = newData;
       const updated = { ...profileData, ...safeData, email: authEmail || profileData.email };
       localStorage.setItem(PROFILE_KEY, JSON.stringify(updated));
       setProfileData(updated);
       return { success: true };
     }
+    if (isGuest) {
+      // Guest — save locally
+      const { profilePhoto, ...safeData } = newData;
+      const updated = { ...profileData, ...safeData };
+      localStorage.setItem('profile_data_guest', JSON.stringify(updated));
+      setProfileData(updated);
+      return { success: true };
+    }
     return { success: false, error: 'No authenticated user' };
-  }, [currentUser, profileData, authEmail]);
+  }, [currentUser, isGuest, profileData, authEmail]);
 
   // ── Upload profile photo via backend → ImageKit ───────────────────────────
   const uploadProfilePhoto = useCallback(async (file) => {
-    if (!currentUser || currentUser === 'guest')
+    if (!currentUser)
       return { success: false, error: 'Guest users cannot upload photos' };
 
     try {
@@ -219,6 +250,14 @@ export const AuthProvider = ({ children }) => {
     // Warmup render-hosted backend
     fetch(`${API}/`).catch(() => {});
 
+    // Guest users: purely client-side, skip all backend calls
+    if (getIsGuest()) {
+      const gData = localStorage.getItem('user_data_guest');
+      setUserData(gData ? JSON.parse(gData) : null);
+      setIsLoading(false);
+      return;
+    }
+
     const token = localStorage.getItem('token');
 
     if (!token) {
@@ -252,20 +291,13 @@ export const AuthProvider = ({ children }) => {
       .catch(() => setIsLoading(false));
   }, []);
 
-  // ── Guest user data restore ───────────────────────────────────────────────
-  useEffect(() => {
-    if (currentUser === 'guest') {
-      const gData = localStorage.getItem('user_data_guest');
-      setUserData(gData ? JSON.parse(gData) : null);
-      setIsLoading(false);
-    }
-  }, [currentUser]);
-
   // ── Login ─────────────────────────────────────────────────────────────────
   const login = useCallback(async (username, password) => {
     try {
       localStorage.removeItem('token');
+      localStorage.removeItem('isGuest');
       setCurrentUser(null);
+      setIsGuest(false);
 
       const res = await fetch(`${API}/api/auth/login`, {
         method: 'POST',
@@ -326,6 +358,9 @@ export const AuthProvider = ({ children }) => {
   // ── Signup ────────────────────────────────────────────────────────────────
   const signup = useCallback(async (username, email, password) => {
     try {
+      localStorage.removeItem('isGuest');
+      setIsGuest(false);
+
       const res = await fetch(`${API}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -376,22 +411,31 @@ export const AuthProvider = ({ children }) => {
   // ── Logout ────────────────────────────────────────────────────────────────
   const logout = useCallback(() => {
     localStorage.removeItem('token');
+    localStorage.removeItem('isGuest');
     localStorage.removeItem('profile_data_local');
+    localStorage.removeItem('profile_data_guest');
     localStorage.removeItem('vtop_imported_data');
+    localStorage.removeItem('user_data_guest');
     setCurrentUser(null);
+    setIsGuest(false);
     setAuthEmail('');
     setUserData(null);
     setScoreFlowData(null);
   }, []);
 
-  // ── Guest mode (purely client-side, no JWT) ───────────────────────────────
+  // ── Guest mode (purely client-side, no JWT, no backend calls) ────────────
   const loginAsGuest = useCallback(() => {
-    setCurrentUser('guest');
+    localStorage.setItem('isGuest', 'true');
+    setIsGuest(true);
+    // currentUser stays null — guest identity is tracked via localStorage flag only
+    const gData = localStorage.getItem('user_data_guest');
+    setUserData(gData ? JSON.parse(gData) : null);
+    setIsLoading(false);
   }, []);
 
   // ── Save GPA data ─────────────────────────────────────────────────────────
   const saveUserData = useCallback(async (data) => {
-    if (currentUser === 'guest') {
+    if (isGuest) {
       localStorage.setItem('user_data_guest', JSON.stringify(data));
       setUserData(data);
       return;
@@ -403,18 +447,23 @@ export const AuthProvider = ({ children }) => {
     });
     const result = await res.json();
     if (result.success) setUserData(data || {});
-  }, [currentUser, API]);
+  }, [isGuest, API]);
 
   // ── Save ScoreFlow data ───────────────────────────────────────────────────
   const saveScoreFlowData = useCallback(async (data) => {
     // Guest: localStorage only — no backend
-    if (!currentUser || currentUser === 'guest') {
+    if (isGuest) {
       if (data) {
         localStorage.setItem('vtop_imported_data', JSON.stringify(data));
       } else {
         localStorage.removeItem('vtop_imported_data');
       }
       setScoreFlowData(data);
+      return;
+    }
+
+    if (!currentUser) {
+      // Not logged in and not a guest — ignore
       return;
     }
 
@@ -435,7 +484,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Save ScoreFlow Error:', err);
     }
-  }, [currentUser, API]);
+  }, [isGuest, currentUser, API]);
 
   // ── Change password (Protected — token auth, no username in body) ─────────
   const changePassword = useCallback(async (currentPassword, newPassword) => {
@@ -455,12 +504,12 @@ export const AuthProvider = ({ children }) => {
   }, [API]);
 
   const contextValue = useMemo(() => ({
-    currentUser, login, signup, logout, loginAsGuest,
+    currentUser, isGuest, login, signup, logout, loginAsGuest,
     userData, saveUserData, isLoading,
     profileData, updateProfileData, uploadProfilePhoto,
     scoreFlowData, saveScoreFlowData, changePassword
   }), [
-    currentUser, login, signup, logout, loginAsGuest,
+    currentUser, isGuest, login, signup, logout, loginAsGuest,
     userData, saveUserData, isLoading,
     profileData, updateProfileData, uploadProfilePhoto,
     scoreFlowData, saveScoreFlowData, changePassword

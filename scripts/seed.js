@@ -42,7 +42,7 @@ async function setup() {
     overall: null
   };
 
-  const res = await fetch('http://localhost:5000/api/data/save', {
+  const res = await fetch('https://gravital-backend.onrender.com/api/data/save', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, data })

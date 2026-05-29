@@ -48,10 +48,10 @@ const getGreeting = () => {
 };
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { currentUser, profileData } = useAuth();
+  const { currentUser, isGuest, profileData } = useAuth();
 
-  // Treat guests as logged out for the sake of the landing page UI
-  const isRealUser = currentUser && currentUser !== 'guest';
+  // A "real" user is authenticated (has currentUser) and is NOT a guest
+  const isRealUser = !!currentUser && !isGuest;
 
   // Capitalize user's name dynamically (e.g., "darshan" -> "Darshan")
   const displayName = profileData?.name?.trim() || currentUser || '';
