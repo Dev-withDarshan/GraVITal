@@ -928,6 +928,7 @@
   font-weight: 800;
   background: var(--gradient-primary);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1;
 }
@@ -1673,6 +1674,7 @@
 [data-theme="light"] .sem-bottom-gpa-val {
   background: var(--gradient-primary);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

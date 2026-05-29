@@ -65,13 +65,14 @@ export default function Navbar() {
 
   const isOnDashboard = location.pathname === '/dashboard';
   const isAuthScreen = location.pathname === '/login';
+  const isLandingPage = location.pathname === '/';
 
   return (
     <nav className={`navbar-premium ${isAuthScreen ? 'navbar-hidden-until-hover' : ''}`}>
       <div className="navbar-inner">
         {/* ── LEFT: Logo ── */}
         <div className="navbar-left">
-          {(isAuthenticated || isGuest) && (
+          {(isAuthenticated || isGuest) && !isAuthScreen && !isLandingPage && (
             <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -84,7 +85,7 @@ export default function Navbar() {
 
         {/* ── CENTER: Navigation Tabs ── */}
         <div className="navbar-center">
-          {(isAuthenticated || isGuest) && (
+          {(isAuthenticated || isGuest) && !isAuthScreen && !isLandingPage && (
             <div className="nav-tabs-container">
               {navTabs.map((tab) => (
                 <button
@@ -111,7 +112,7 @@ export default function Navbar() {
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          {(isAuthenticated || isGuest) ? (
+          {(isAuthenticated || isGuest) && !isAuthScreen ? (
             <div className="auth-actions-logged-in">
               {isAuthenticated && onSave && (
                 <MagneticButton
@@ -207,7 +208,7 @@ export default function Navbar() {
       </div>
 
       {/* ── Mobile Slide-Down Nav ── */}
-      {(isAuthenticated || isGuest) && mobileMenuOpen && (
+      {(isAuthenticated || isGuest) && !isAuthScreen && !isLandingPage && mobileMenuOpen && (
         <div className="mobile-nav-drawer animate-fade-in">
           {navTabs.map((tab) => (
             <button
